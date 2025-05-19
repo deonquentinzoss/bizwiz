@@ -9,6 +9,7 @@ A Flutter web application featuring an interactive card-based interface.
 - Detailed view dialog for each card
 - Smooth scrolling interface
 - Material Design 3 styling
+- Automatic light/dark theme based on system settings
 
 ## Getting Started
 
