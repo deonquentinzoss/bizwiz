@@ -89,8 +89,26 @@ class FilterBar extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Spacer(),
+                Expanded(
+                  child: Wrap(
+                    spacing: 16,
+                    runSpacing: 16,
+                    children: [
+                      // Basic Filters
+                      _buildBasicFilters(context, currencyFormat),
+                      // Clear All Button
+                      TextButton.icon(
+                        onPressed: onClearFilters,
+                        icon: const Icon(Icons.clear_all),
+                        label: const Text('Clear All'),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                // Search Bar
                 SizedBox(
                   width: 300,
                   child: CustomSearchBar(
@@ -99,26 +117,11 @@ class FilterBar extends StatelessWidget {
                     onClearHistory: onClearHistory,
                   ),
                 ),
-                const SizedBox(width: 16),
-                TextButton.icon(
-                  onPressed: onClearFilters,
-                  icon: const Icon(Icons.clear_all),
-                  label: const Text('Clear All'),
-                ),
               ],
             ),
             const SizedBox(height: 16),
-            Wrap(
-              spacing: 16,
-              runSpacing: 16,
-              children: [
-                // Basic Filters
-                _buildBasicFilters(context, currencyFormat),
-                const SizedBox(height: 16),
-                // Advanced Filters
-                _buildAdvancedFilters(context),
-              ],
-            ),
+            // Advanced Filters
+            _buildAdvancedFilters(context),
           ],
         ),
       ),
@@ -126,256 +129,249 @@ class FilterBar extends StatelessWidget {
   }
 
   Widget _buildBasicFilters(BuildContext context, NumberFormat currencyFormat) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Wrap(
+      spacing: 16,
+      runSpacing: 16,
       children: [
-        Wrap(
-          spacing: 16,
-          runSpacing: 16,
-          children: [
-            // Category Filter
-            SizedBox(
-              width: 200,
-              child: DropdownButtonFormField<String>(
-                isExpanded: true,
-                decoration: const InputDecoration(
-                  labelText: 'Categories',
-                  border: UnderlineInputBorder(),
-                ),
-                hint: const Text('Select Categories'),
-                value: null,
-                items: categories.map((category) {
-                  final isSelected = selectedCategories.contains(category);
-                  return DropdownMenuItem<String>(
-                    value: category,
-                    child: Row(
-                      children: [
-                        if (isSelected)
-                          const Icon(Icons.check, size: 20)
-                        else
-                          const SizedBox(width: 20),
-                        const SizedBox(width: 8),
-                        Expanded(child: Text(category)),
-                      ],
-                    ),
-                  );
-                }).toList(),
-                onChanged: (category) {
-                  if (category != null) {
-                    final newSelection = List<String>.from(selectedCategories);
-                    if (newSelection.contains(category)) {
-                      newSelection.remove(category);
-                    } else {
-                      newSelection.add(category);
-                    }
-                    onCategoriesChanged(newSelection);
-                  }
-                },
-                selectedItemBuilder: (context) {
-                  return [
-                    DropdownMenuItem<String>(
-                      value: null,
-                      child: Text(
-                        selectedCategories.isEmpty
-                            ? 'Select Categories'
-                            : '${selectedCategories.length} Selected',
-                      ),
-                    ),
-                  ];
-                },
-              ),
+        // Category Filter
+        SizedBox(
+          width: 200,
+          child: DropdownButtonFormField<String>(
+            isExpanded: true,
+            decoration: const InputDecoration(
+              labelText: 'Categories',
+              border: UnderlineInputBorder(),
             ),
-            // Business Model Filter
-            SizedBox(
-              width: 250,
-              child: DropdownButtonFormField<String>(
-                isExpanded: true,
-                decoration: const InputDecoration(
-                  labelText: 'Business Models',
-                  border: UnderlineInputBorder(),
+            hint: const Text('Select Categories'),
+            value: null,
+            items: categories.map((category) {
+              final isSelected = selectedCategories.contains(category);
+              return DropdownMenuItem<String>(
+                value: category,
+                child: Row(
+                  children: [
+                    if (isSelected)
+                      const Icon(Icons.check, size: 20)
+                    else
+                      const SizedBox(width: 20),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(category)),
+                  ],
                 ),
-                hint: const Text('Select Business Models'),
-                value: null,
-                items: businessModels.map((model) {
-                  final isSelected = selectedBusinessModels.contains(model);
-                  return DropdownMenuItem<String>(
-                    value: model,
-                    child: Row(
-                      children: [
-                        if (isSelected)
-                          const Icon(Icons.check, size: 20)
-                        else
-                          const SizedBox(width: 20),
-                        const SizedBox(width: 8),
-                        Expanded(child: Text(model)),
-                      ],
-                    ),
-                  );
-                }).toList(),
-                onChanged: (model) {
-                  if (model != null) {
-                    final newSelection =
-                        List<String>.from(selectedBusinessModels);
-                    if (newSelection.contains(model)) {
-                      newSelection.remove(model);
-                    } else {
-                      newSelection.add(model);
-                    }
-                    onBusinessModelsChanged(newSelection);
-                  }
-                },
-                selectedItemBuilder: (context) {
-                  return [
-                    DropdownMenuItem<String>(
-                      value: null,
-                      child: Text(
-                        selectedBusinessModels.isEmpty
-                            ? 'Select Business Models'
-                            : '${selectedBusinessModels.length} Selected',
-                      ),
-                    ),
-                  ];
-                },
-              ),
+              );
+            }).toList(),
+            onChanged: (category) {
+              if (category != null) {
+                final newSelection = List<String>.from(selectedCategories);
+                if (newSelection.contains(category)) {
+                  newSelection.remove(category);
+                } else {
+                  newSelection.add(category);
+                }
+                onCategoriesChanged(newSelection);
+              }
+            },
+            selectedItemBuilder: (context) {
+              return [
+                DropdownMenuItem<String>(
+                  value: null,
+                  child: Text(
+                    selectedCategories.isEmpty
+                        ? 'Select Categories'
+                        : '${selectedCategories.length} Selected',
+                  ),
+                ),
+              ];
+            },
+          ),
+        ),
+        // Business Model Filter
+        SizedBox(
+          width: 250,
+          child: DropdownButtonFormField<String>(
+            isExpanded: true,
+            decoration: const InputDecoration(
+              labelText: 'Business Models',
+              border: UnderlineInputBorder(),
             ),
-            // Technology Stack Filter
-            SizedBox(
-              width: 200,
-              child: DropdownButtonFormField<String>(
-                isExpanded: true,
-                decoration: const InputDecoration(
-                  labelText: 'Technologies',
-                  border: UnderlineInputBorder(),
+            hint: const Text('Select Business Models'),
+            value: null,
+            items: businessModels.map((model) {
+              final isSelected = selectedBusinessModels.contains(model);
+              return DropdownMenuItem<String>(
+                value: model,
+                child: Row(
+                  children: [
+                    if (isSelected)
+                      const Icon(Icons.check, size: 20)
+                    else
+                      const SizedBox(width: 20),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(model)),
+                  ],
                 ),
-                hint: const Text('Select Technologies'),
-                value: null,
-                items: techStacks.map((tech) {
-                  final isSelected = selectedTechStacks.contains(tech);
-                  return DropdownMenuItem<String>(
-                    value: tech,
-                    child: Row(
-                      children: [
-                        if (isSelected)
-                          const Icon(Icons.check, size: 20)
-                        else
-                          const SizedBox(width: 20),
-                        const SizedBox(width: 8),
-                        Expanded(child: Text(tech)),
-                      ],
-                    ),
-                  );
-                }).toList(),
-                onChanged: (tech) {
-                  if (tech != null) {
-                    final newSelection = List<String>.from(selectedTechStacks);
-                    if (newSelection.contains(tech)) {
-                      newSelection.remove(tech);
-                    } else {
-                      newSelection.add(tech);
-                    }
-                    onTechStacksChanged(newSelection);
-                  }
-                },
-                selectedItemBuilder: (context) {
-                  return [
-                    DropdownMenuItem<String>(
-                      value: null,
-                      child: Text(
-                        selectedTechStacks.isEmpty
-                            ? 'Select Technologies'
-                            : '${selectedTechStacks.length} Selected',
-                      ),
-                    ),
-                  ];
-                },
-              ),
+              );
+            }).toList(),
+            onChanged: (model) {
+              if (model != null) {
+                final newSelection = List<String>.from(selectedBusinessModels);
+                if (newSelection.contains(model)) {
+                  newSelection.remove(model);
+                } else {
+                  newSelection.add(model);
+                }
+                onBusinessModelsChanged(newSelection);
+              }
+            },
+            selectedItemBuilder: (context) {
+              return [
+                DropdownMenuItem<String>(
+                  value: null,
+                  child: Text(
+                    selectedBusinessModels.isEmpty
+                        ? 'Select Business Models'
+                        : '${selectedBusinessModels.length} Selected',
+                  ),
+                ),
+              ];
+            },
+          ),
+        ),
+        // Technology Stack Filter
+        SizedBox(
+          width: 200,
+          child: DropdownButtonFormField<String>(
+            isExpanded: true,
+            decoration: const InputDecoration(
+              labelText: 'Technologies',
+              border: UnderlineInputBorder(),
             ),
-            // Start Date Filter
-            SizedBox(
-              width: 200,
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Founded Date',
-                  border: UnderlineInputBorder(),
-                  suffixIcon: Icon(Icons.calendar_today),
+            hint: const Text('Select Technologies'),
+            value: null,
+            items: techStacks.map((tech) {
+              final isSelected = selectedTechStacks.contains(tech);
+              return DropdownMenuItem<String>(
+                value: tech,
+                child: Row(
+                  children: [
+                    if (isSelected)
+                      const Icon(Icons.check, size: 20)
+                    else
+                      const SizedBox(width: 20),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(tech)),
+                  ],
                 ),
-                readOnly: true,
-                controller: TextEditingController(
-                  text: startDate != null
-                      ? DateFormat.yMMMd().format(startDate!)
-                      : '',
+              );
+            }).toList(),
+            onChanged: (tech) {
+              if (tech != null) {
+                final newSelection = List<String>.from(selectedTechStacks);
+                if (newSelection.contains(tech)) {
+                  newSelection.remove(tech);
+                } else {
+                  newSelection.add(tech);
+                }
+                onTechStacksChanged(newSelection);
+              }
+            },
+            selectedItemBuilder: (context) {
+              return [
+                DropdownMenuItem<String>(
+                  value: null,
+                  child: Text(
+                    selectedTechStacks.isEmpty
+                        ? 'Select Technologies'
+                        : '${selectedTechStacks.length} Selected',
+                  ),
                 ),
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: startDate ?? DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime.now(),
-                  );
-                  if (date != null) {
-                    onStartDateChanged(date);
-                  }
-                },
-              ),
+              ];
+            },
+          ),
+        ),
+        // Start Date Filter
+        SizedBox(
+          width: 200,
+          child: TextFormField(
+            decoration: const InputDecoration(
+              labelText: 'Founded Date',
+              border: UnderlineInputBorder(),
+              suffixIcon: Icon(Icons.calendar_today),
             ),
-            // Revenue Range Filter
-            SizedBox(
-              width: 200,
-              child: DropdownButtonFormField<RevenueRange>(
-                isExpanded: true,
-                decoration: const InputDecoration(
-                  labelText: 'Revenue',
-                  border: UnderlineInputBorder(),
-                ),
-                hint: const Text('Select Revenue Range'),
-                value: revenueRanges.firstWhere(
-                  (range) => range.min == minRevenue && range.max == maxRevenue,
-                  orElse: () => revenueRanges.first,
-                ),
-                items: revenueRanges.map((range) {
-                  return DropdownMenuItem<RevenueRange>(
-                    value: range,
-                    child: Text(range.label),
-                  );
-                }).toList(),
-                onChanged: (range) {
-                  if (range != null) {
-                    onMinRevenueChanged(range.min);
-                    onMaxRevenueChanged(range.max);
-                  }
-                },
-              ),
+            readOnly: true,
+            controller: TextEditingController(
+              text: startDate != null
+                  ? DateFormat.yMMMd().format(startDate!)
+                  : '',
             ),
-            // Team Size Filter
-            SizedBox(
-              width: 200,
-              child: DropdownButtonFormField<TeamSizeRange>(
-                isExpanded: true,
-                decoration: const InputDecoration(
-                  labelText: 'Team Size',
-                  border: UnderlineInputBorder(),
-                ),
-                hint: const Text('Select Team Size'),
-                value: teamSizeRanges.firstWhere(
-                  (range) =>
-                      range.min == minTeamSize && range.max == maxTeamSize,
-                  orElse: () => teamSizeRanges.first,
-                ),
-                items: teamSizeRanges.map((range) {
-                  return DropdownMenuItem<TeamSizeRange>(
-                    value: range,
-                    child: Text(range.label),
-                  );
-                }).toList(),
-                onChanged: (range) {
-                  if (range != null) {
-                    onMinTeamSizeChanged(range.min);
-                    onMaxTeamSizeChanged(range.max);
-                  }
-                },
-              ),
+            onTap: () async {
+              final date = await showDatePicker(
+                context: context,
+                initialDate: startDate ?? DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime.now(),
+              );
+              if (date != null) {
+                onStartDateChanged(date);
+              }
+            },
+          ),
+        ),
+        // Revenue Range Filter
+        SizedBox(
+          width: 200,
+          child: DropdownButtonFormField<RevenueRange>(
+            isExpanded: true,
+            decoration: const InputDecoration(
+              labelText: 'Revenue',
+              border: UnderlineInputBorder(),
             ),
-          ],
+            hint: const Text('Select Revenue Range'),
+            value: revenueRanges.firstWhere(
+              (range) => range.min == minRevenue && range.max == maxRevenue,
+              orElse: () => revenueRanges.first,
+            ),
+            items: revenueRanges.map((range) {
+              return DropdownMenuItem<RevenueRange>(
+                value: range,
+                child: Text(range.label),
+              );
+            }).toList(),
+            onChanged: (range) {
+              if (range != null) {
+                onMinRevenueChanged(range.min);
+                onMaxRevenueChanged(range.max);
+              }
+            },
+          ),
+        ),
+        // Team Size Filter
+        SizedBox(
+          width: 200,
+          child: DropdownButtonFormField<TeamSizeRange>(
+            isExpanded: true,
+            decoration: const InputDecoration(
+              labelText: 'Team Size',
+              border: UnderlineInputBorder(),
+            ),
+            hint: const Text('Select Team Size'),
+            value: teamSizeRanges.firstWhere(
+              (range) => range.min == minTeamSize && range.max == maxTeamSize,
+              orElse: () => teamSizeRanges.first,
+            ),
+            items: teamSizeRanges.map((range) {
+              return DropdownMenuItem<TeamSizeRange>(
+                value: range,
+                child: Text(range.label),
+              );
+            }).toList(),
+            onChanged: (range) {
+              if (range != null) {
+                onMinTeamSizeChanged(range.min);
+                onMaxTeamSizeChanged(range.max);
+              }
+            },
+          ),
         ),
       ],
     );

@@ -47,6 +47,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final CompanyService _companyService = CompanyService();
   final List<String> _searchHistory = [];
+  String? _searchQuery;
   List<String> _selectedCategories = [];
   DateTime? _startDate;
   double? _minRevenue;
@@ -108,6 +109,7 @@ class _HomePageState extends State<HomePage> {
   List<Company> get _filteredAndSortedCompanies {
     // Check if filters have changed
     final currentFilterState = {
+      'searchQuery': _searchQuery,
       'categories': _selectedCategories,
       'startDate': _startDate,
       'minRevenue': _minRevenue,
@@ -126,7 +128,7 @@ class _HomePageState extends State<HomePage> {
 
     // Update cache
     _lastFilterState = currentFilterState;
-    _cachedFilteredCompanies = _companyService.filterCompanies(
+    var companies = _companyService.filterCompanies(
       categories: _selectedCategories,
       startDate: _startDate,
       minRevenue: _minRevenue,
@@ -137,11 +139,30 @@ class _HomePageState extends State<HomePage> {
       businessModels: _selectedBusinessModels,
     );
 
-    return _cachedFilteredCompanies!;
+    // Apply search filter if query exists
+    if (_searchQuery != null && _searchQuery!.isNotEmpty) {
+      final query = _searchQuery!.toLowerCase();
+      companies = companies.where((company) {
+        return company.name.toLowerCase().contains(query) ||
+            company.elevatorPitch.toLowerCase().contains(query) ||
+            company.category.any((cat) => cat.toLowerCase().contains(query)) ||
+            company.techStack
+                .any((tech) => tech.toLowerCase().contains(query)) ||
+            company.businessModel.toLowerCase().contains(query) ||
+            company.founder.name.toLowerCase().contains(query);
+      }).toList();
+    } else if (_searchQuery != null) {
+      // If search query is empty string, show all companies
+      companies = _companyService.getAllCompanies();
+    }
+
+    _cachedFilteredCompanies = companies;
+    return companies;
   }
 
   void _clearFilters() {
     setState(() {
+      _searchQuery = null;
       _selectedCategories = [];
       _startDate = null;
       _minRevenue = null;
@@ -257,6 +278,7 @@ class _HomePageState extends State<HomePage> {
                   onClearFilters: _clearFilters,
                   onSearch: (query) {
                     setState(() {
+                      _searchQuery = query;
                       if (query.isNotEmpty && !_searchHistory.contains(query)) {
                         _searchHistory.add(query);
                       }

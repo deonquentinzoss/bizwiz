@@ -41,12 +41,10 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
   }
 
   void _onSearch(String query) {
-    if (query.isNotEmpty) {
-      widget.onSearch(query);
-      setState(() {
-        _showHistory = false;
-      });
-    }
+    widget.onSearch(query);
+    setState(() {
+      _showHistory = query.isEmpty;
+    });
   }
 
   @override
@@ -64,6 +62,7 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
                     icon: const Icon(Icons.clear),
                     onPressed: () {
                       _searchController.clear();
+                      _onSearch(''); // Trigger search with empty string
                       setState(() {
                         _showHistory = true;
                       });
