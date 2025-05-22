@@ -6,7 +6,9 @@ class FilterBar extends StatelessWidget {
   final List<String> categories;
   final List<String> techStacks;
   final List<String> businessModels;
+  final List<String> industries;
   final List<String> selectedCategories;
+  final List<String> selectedIndustries;
   final DateTime? startDate;
   final double? minRevenue;
   final double? maxRevenue;
@@ -15,6 +17,7 @@ class FilterBar extends StatelessWidget {
   final List<String> selectedTechStacks;
   final List<String> selectedBusinessModels;
   final Function(List<String>) onCategoriesChanged;
+  final Function(List<String>) onIndustriesChanged;
   final Function(DateTime?) onStartDateChanged;
   final Function(double?) onMinRevenueChanged;
   final Function(double?) onMaxRevenueChanged;
@@ -32,7 +35,9 @@ class FilterBar extends StatelessWidget {
     required this.categories,
     required this.techStacks,
     required this.businessModels,
+    required this.industries,
     this.selectedCategories = const [],
+    this.selectedIndustries = const [],
     this.startDate,
     this.minRevenue,
     this.maxRevenue,
@@ -41,6 +46,7 @@ class FilterBar extends StatelessWidget {
     this.selectedTechStacks = const [],
     this.selectedBusinessModels = const [],
     required this.onCategoriesChanged,
+    required this.onIndustriesChanged,
     required this.onStartDateChanged,
     required this.onMinRevenueChanged,
     required this.onMaxRevenueChanged,
@@ -208,6 +214,58 @@ class FilterBar extends StatelessWidget {
                     selectedCategories.isEmpty
                         ? 'Select Categories'
                         : '${selectedCategories.length} Selected',
+                  ),
+                ),
+              ];
+            },
+          ),
+        ),
+        // Industry Filter
+        SizedBox(
+          width: filterWidth,
+          child: DropdownButtonFormField<String>(
+            isExpanded: true,
+            decoration: const InputDecoration(
+              labelText: 'Industries',
+              border: UnderlineInputBorder(),
+            ),
+            hint: const Text('Select Industries'),
+            value: null,
+            items: industries.map((industry) {
+              final isSelected = selectedIndustries.contains(industry);
+              return DropdownMenuItem<String>(
+                value: industry,
+                child: Row(
+                  children: [
+                    if (isSelected)
+                      const Icon(Icons.check, size: 20)
+                    else
+                      const SizedBox(width: 20),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(industry)),
+                  ],
+                ),
+              );
+            }).toList(),
+            onChanged: (industry) {
+              if (industry != null) {
+                final newSelection = List<String>.from(selectedIndustries);
+                if (newSelection.contains(industry)) {
+                  newSelection.remove(industry);
+                } else {
+                  newSelection.add(industry);
+                }
+                onIndustriesChanged(newSelection);
+              }
+            },
+            selectedItemBuilder: (context) {
+              return [
+                DropdownMenuItem<String>(
+                  value: null,
+                  child: Text(
+                    selectedIndustries.isEmpty
+                        ? 'Select Industries'
+                        : '${selectedIndustries.length} Selected',
                   ),
                 ),
               ];
@@ -419,6 +477,7 @@ class FilterBar extends StatelessWidget {
   Widget _buildSelectedFilters(BuildContext context) {
     final theme = Theme.of(context);
     final hasSelectedFilters = selectedCategories.isNotEmpty ||
+        selectedIndustries.isNotEmpty ||
         selectedTechStacks.isNotEmpty ||
         selectedBusinessModels.isNotEmpty ||
         startDate != null ||
@@ -439,6 +498,14 @@ class FilterBar extends StatelessWidget {
                 final newSelection = List<String>.from(selectedCategories)
                   ..remove(category);
                 onCategoriesChanged(newSelection);
+              },
+            )),
+        ...selectedIndustries.map((industry) => Chip(
+              label: Text(industry),
+              onDeleted: () {
+                final newSelection = List<String>.from(selectedIndustries)
+                  ..remove(industry);
+                onIndustriesChanged(newSelection);
               },
             )),
         ...selectedTechStacks.map((tech) => Chip(

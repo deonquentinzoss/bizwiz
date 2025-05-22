@@ -23,6 +23,7 @@ class SearchService {
     List<String>? categories,
     List<String>? techStacks,
     List<String>? businessModels,
+    List<String>? industries,
   }) {
     if (query.isEmpty) {
       return _companyService.getAllCompanies();
@@ -59,6 +60,12 @@ class SearchService {
 
       // Business model search
       if (company.businessModel.toLowerCase().contains(lowercaseQuery)) {
+        return true;
+      }
+
+      // Industry search
+      if (company.industry
+          .any((ind) => ind.toLowerCase().contains(lowercaseQuery))) {
         return true;
       }
 

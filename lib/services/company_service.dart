@@ -133,6 +133,11 @@ class CompanyService {
       ..sort();
   }
 
+  List<String> getAllIndustries() {
+    return _companies.expand((company) => company.industry).toSet().toList()
+      ..sort();
+  }
+
   void saveFilterState(Map<String, dynamic> state) {
     _filterState.clear();
     _filterState.addAll(state);
@@ -145,6 +150,7 @@ class CompanyService {
   List<Company> filterCompanies(
     List<Company> companies, {
     List<String>? categories,
+    List<String>? industries,
     List<String>? techStacks,
     List<String>? businessModels,
     DateTime? startDate,
@@ -156,6 +162,12 @@ class CompanyService {
     return companies.where((company) {
       if (categories != null && categories.isNotEmpty) {
         if (!company.category.any((cat) => categories.contains(cat))) {
+          return false;
+        }
+      }
+
+      if (industries != null && industries.isNotEmpty) {
+        if (!company.industry.any((ind) => industries.contains(ind))) {
           return false;
         }
       }

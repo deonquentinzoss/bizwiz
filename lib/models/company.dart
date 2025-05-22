@@ -9,6 +9,7 @@ class Company {
   final Revenue revenue;
   final int teamSize;
   final List<String> category;
+  final List<String> industry;
   final Founder founder;
   final String companyHistory;
   final List<Milestone> milestones;
@@ -26,6 +27,7 @@ class Company {
     required this.revenue,
     required this.teamSize,
     required this.category,
+    required this.industry,
     required this.founder,
     required this.companyHistory,
     required this.milestones,
@@ -45,6 +47,7 @@ class Company {
       revenue: Revenue.fromJson(json['revenue'] as Map<String, dynamic>),
       teamSize: json['teamSize'] as int,
       category: List<String>.from(json['category'] as List),
+      industry: List<String>.from(json['industry'] as List),
       founder: Founder.fromJson(json['founder'] as Map<String, dynamic>),
       companyHistory: json['companyHistory'] as String,
       milestones: (json['milestones'] as List)
@@ -68,6 +71,7 @@ class Company {
       'revenue': revenue.toJson(),
       'teamSize': teamSize,
       'category': category,
+      'industry': industry,
       'founder': founder.toJson(),
       'companyHistory': companyHistory,
       'milestones': milestones.map((e) => e.toJson()).toList(),

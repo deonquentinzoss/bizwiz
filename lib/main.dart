@@ -63,6 +63,7 @@ class _HomePageState extends State<HomePage> {
   List<String> _selectedCategories = [];
   List<String> _selectedTechStacks = [];
   List<String> _selectedBusinessModels = [];
+  List<String> _selectedIndustries = [];
   DateTime? _startDate;
   double? _minRevenue;
   double? _maxRevenue;
@@ -125,6 +126,13 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void _handleIndustriesChanged(List<String> industries) {
+    setState(() {
+      _selectedIndustries = industries;
+      _updateFilteredCompanies();
+    });
+  }
+
   void _handleStartDateChanged(DateTime? date) {
     setState(() {
       _startDate = date;
@@ -179,6 +187,7 @@ class _HomePageState extends State<HomePage> {
       _selectedCategories = [];
       _selectedTechStacks = [];
       _selectedBusinessModels = [];
+      _selectedIndustries = [];
       _startDate = null;
       _minRevenue = null;
       _maxRevenue = null;
@@ -195,9 +204,9 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _handleFavoriteToggle(String companyId) {
+  void _handleFavoriteToggle(Company company) {
     setState(() {
-      _favoritesService.toggleFavorite(companyId);
+      _favoritesService.toggleFavorite(company.id);
       _updateFilteredCompanies();
     });
   }
@@ -219,6 +228,7 @@ class _HomePageState extends State<HomePage> {
         categories: _selectedCategories,
         techStacks: _selectedTechStacks,
         businessModels: _selectedBusinessModels,
+        industries: _selectedIndustries,
       );
     }
 
@@ -228,6 +238,7 @@ class _HomePageState extends State<HomePage> {
       categories: _selectedCategories,
       techStacks: _selectedTechStacks,
       businessModels: _selectedBusinessModels,
+      industries: _selectedIndustries,
       startDate: _startDate,
       minRevenue: _minRevenue,
       maxRevenue: _maxRevenue,
@@ -275,9 +286,11 @@ class _HomePageState extends State<HomePage> {
                       categories: _companyService.getAllCategories(),
                       techStacks: _companyService.getAllTechStacks(),
                       businessModels: _companyService.getAllBusinessModels(),
+                      industries: _companyService.getAllIndustries(),
                       selectedCategories: _selectedCategories,
                       selectedTechStacks: _selectedTechStacks,
                       selectedBusinessModels: _selectedBusinessModels,
+                      selectedIndustries: _selectedIndustries,
                       startDate: _startDate,
                       minRevenue: _minRevenue,
                       maxRevenue: _maxRevenue,
@@ -286,6 +299,7 @@ class _HomePageState extends State<HomePage> {
                       onCategoriesChanged: _handleCategoriesChanged,
                       onTechStacksChanged: _handleTechStacksChanged,
                       onBusinessModelsChanged: _handleBusinessModelsChanged,
+                      onIndustriesChanged: _handleIndustriesChanged,
                       onStartDateChanged: _handleStartDateChanged,
                       onMinRevenueChanged: _handleMinRevenueChanged,
                       onMaxRevenueChanged: _handleMaxRevenueChanged,

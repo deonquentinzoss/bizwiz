@@ -16,6 +16,7 @@ final List<Company> mockCompanies = [
     ),
     teamSize: 200,
     category: ['Productivity', 'SaaS', 'Collaboration'],
+    industry: ['Technology', 'Cloud Computing', 'Enterprise Software'],
     founder: const Founder(
       name: 'Ivan Zhao',
       bio:
@@ -63,6 +64,7 @@ final List<Company> mockCompanies = [
     ),
     teamSize: 50,
     category: ['Development', 'SaaS', 'Project Management'],
+    industry: ['Technology', 'Cloud Computing', 'Enterprise Software'],
     founder: const Founder(
       name: 'Karri Saarinen',
       bio:
@@ -106,6 +108,7 @@ final List<Company> mockCompanies = [
     ),
     teamSize: 150,
     category: ['Development', 'Cloud', 'Infrastructure'],
+    industry: ['Technology', 'Cloud Computing', 'Infrastructure'],
     founder: const Founder(
       name: 'Guillermo Rauch',
       bio: 'Creator of Socket.io and former CTO of LearnBoost.',
@@ -151,6 +154,7 @@ final List<Company> mockCompanies = [
     ),
     teamSize: 3000,
     category: ['Fintech', 'Payments', 'SaaS'],
+    industry: ['Technology', 'Finance', 'Enterprise Software'],
     founder: const Founder(
       name: 'Patrick Collison',
       bio: 'Former founder of Auctomatic and Shuppa.',
@@ -197,6 +201,7 @@ final List<Company> mockCompanies = [
     ),
     teamSize: 400,
     category: ['Design', 'SaaS', 'Collaboration'],
+    industry: ['Technology', 'Design', 'Cloud Computing'],
     founder: const Founder(
       name: 'Dylan Field',
       bio: 'Former intern at Flipboard and LinkedIn.',
@@ -239,6 +244,7 @@ final List<Company> mockCompanies = [
     ),
     teamSize: 2000,
     category: ['Development', 'SaaS', 'Collaboration'],
+    industry: ['Technology', 'Cloud Computing', 'Enterprise Software'],
     founder: const Founder(
       name: 'Tom Preston-Werner',
       bio: 'Creator of Jekyll and co-founder of GitHub.',
@@ -282,6 +288,7 @@ final List<Company> mockCompanies = [
     ),
     teamSize: 2500,
     category: ['Communication', 'SaaS', 'Collaboration'],
+    industry: ['Technology', 'Cloud Computing', 'Enterprise Software'],
     founder: const Founder(
       name: 'Stewart Butterfield',
       bio: 'Former founder of Flickr and Tiny Speck.',
@@ -328,6 +335,7 @@ final List<Company> mockCompanies = [
     ),
     teamSize: 5000,
     category: ['Communication', 'SaaS', 'Video'],
+    industry: ['Technology', 'Cloud Computing', 'Enterprise Software'],
     founder: const Founder(
       name: 'Eric Yuan',
       bio: 'Former VP of Engineering at WebEx.',
@@ -374,6 +382,7 @@ final List<Company> mockCompanies = [
     ),
     teamSize: 3000,
     category: ['Storage', 'SaaS', 'Collaboration'],
+    industry: ['Technology', 'Cloud Computing', 'Enterprise Software'],
     founder: const Founder(
       name: 'Drew Houston',
       bio: 'Former founder of Accolade and Bit9.',
@@ -420,6 +429,7 @@ final List<Company> mockCompanies = [
     ),
     teamSize: 5000,
     category: ['Communication', 'API', 'SaaS'],
+    industry: ['Technology', 'Telecommunications', 'Cloud Computing'],
     founder: const Founder(
       name: 'Jeff Lawson',
       bio: 'Former CTO of StubHub and founder of NineStar.',
@@ -466,6 +476,7 @@ final List<Company> mockCompanies = [
     ),
     teamSize: 2000,
     category: ['Database', 'SaaS', 'Infrastructure'],
+    industry: ['Technology', 'Database', 'Cloud Computing'],
     founder: const Founder(
       name: 'Eliot Horowitz',
       bio: 'Former CTO of DoubleClick and founder of ShopWiki.',
@@ -512,6 +523,7 @@ final List<Company> mockCompanies = [
     ),
     teamSize: 1000,
     category: ['Cloud', 'Infrastructure', 'SaaS'],
+    industry: ['Technology', 'Cloud Computing', 'Infrastructure'],
     founder: const Founder(
       name: 'Ben Uretsky',
       bio: 'Former founder of ServerStack and co-founder of DigitalOcean.',
@@ -559,6 +571,7 @@ final List<Company> mockCompanies = [
     ),
     teamSize: 6000,
     category: ['Productivity', 'SaaS', 'Collaboration'],
+    industry: ['Technology', 'Enterprise Software', 'Collaboration'],
     founder: const Founder(
       name: 'Mike Cannon-Brookes',
       bio: 'Co-founder of Atlassian and entrepreneur.',
