@@ -144,7 +144,7 @@ class CompanyService {
   }
 
   List<Company> filterCompanies({
-    String? category,
+    List<String>? categories,
     DateTime? startDate,
     DateTime? endDate,
     double? minRevenue,
@@ -152,12 +152,15 @@ class CompanyService {
     int? minTeamSize,
     int? maxTeamSize,
     List<String>? techStacks,
-    String? businessModel,
+    List<String>? businessModels,
   }) {
     return _companies.where((company) {
       // Basic filters
-      if (category != null && !company.category.contains(category)) {
-        return false;
+      if (categories != null && categories.isNotEmpty) {
+        if (!categories
+            .any((category) => company.category.contains(category))) {
+          return false;
+        }
       }
       if (startDate != null && company.startDate.isBefore(startDate)) {
         return false;
@@ -184,8 +187,10 @@ class CompanyService {
           return false;
         }
       }
-      if (businessModel != null && company.businessModel != businessModel) {
-        return false;
+      if (businessModels != null && businessModels.isNotEmpty) {
+        if (!businessModels.contains(company.businessModel)) {
+          return false;
+        }
       }
 
       return true;

@@ -1,55 +1,80 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'search_bar.dart';
 
 class FilterBar extends StatelessWidget {
   final List<String> categories;
   final List<String> techStacks;
   final List<String> businessModels;
-  final String? selectedCategory;
+  final List<String> selectedCategories;
   final DateTime? startDate;
-  final DateTime? endDate;
   final double? minRevenue;
   final double? maxRevenue;
   final int? minTeamSize;
   final int? maxTeamSize;
   final List<String> selectedTechStacks;
-  final String? selectedBusinessModel;
-  final Function(String?) onCategoryChanged;
+  final List<String> selectedBusinessModels;
+  final Function(List<String>) onCategoriesChanged;
   final Function(DateTime?) onStartDateChanged;
-  final Function(DateTime?) onEndDateChanged;
   final Function(double?) onMinRevenueChanged;
   final Function(double?) onMaxRevenueChanged;
   final Function(int?) onMinTeamSizeChanged;
   final Function(int?) onMaxTeamSizeChanged;
   final Function(List<String>) onTechStacksChanged;
-  final Function(String?) onBusinessModelChanged;
+  final Function(List<String>) onBusinessModelsChanged;
   final VoidCallback onClearFilters;
+  final Function(String) onSearch;
+  final List<String> searchHistory;
+  final VoidCallback onClearHistory;
 
   const FilterBar({
     super.key,
     required this.categories,
     required this.techStacks,
     required this.businessModels,
-    this.selectedCategory,
+    this.selectedCategories = const [],
     this.startDate,
-    this.endDate,
     this.minRevenue,
     this.maxRevenue,
     this.minTeamSize,
     this.maxTeamSize,
     this.selectedTechStacks = const [],
-    this.selectedBusinessModel,
-    required this.onCategoryChanged,
+    this.selectedBusinessModels = const [],
+    required this.onCategoriesChanged,
     required this.onStartDateChanged,
-    required this.onEndDateChanged,
     required this.onMinRevenueChanged,
     required this.onMaxRevenueChanged,
     required this.onMinTeamSizeChanged,
     required this.onMaxTeamSizeChanged,
     required this.onTechStacksChanged,
-    required this.onBusinessModelChanged,
+    required this.onBusinessModelsChanged,
     required this.onClearFilters,
+    required this.onSearch,
+    required this.searchHistory,
+    required this.onClearHistory,
   });
+
+  static final List<RevenueRange> revenueRanges = [
+    RevenueRange('Any Revenue', null, null),
+    RevenueRange('<\$100K', null, 100000.0),
+    RevenueRange('>\$100K', 100000.0, null),
+    RevenueRange('>\$500K', 500000.0, null),
+    RevenueRange('>\$1M', 1000000.0, null),
+    RevenueRange('>\$5M', 5000000.0, null),
+    RevenueRange('>\$10M', 10000000.0, null),
+    RevenueRange('>\$50M', 50000000.0, null),
+    RevenueRange('>\$100M', 100000000.0, null),
+  ];
+
+  static final List<TeamSizeRange> teamSizeRanges = [
+    TeamSizeRange('Any Size', null, null),
+    TeamSizeRange('1-10', 1, 10),
+    TeamSizeRange('11-50', 11, 50),
+    TeamSizeRange('51-200', 51, 200),
+    TeamSizeRange('201-500', 201, 500),
+    TeamSizeRange('501-1000', 501, 1000),
+    TeamSizeRange('1000+', 1001, null),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -65,11 +90,16 @@ class FilterBar extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text(
-                  'Filters',
-                  style: theme.textTheme.titleLarge,
-                ),
                 const Spacer(),
+                SizedBox(
+                  width: 300,
+                  child: CustomSearchBar(
+                    onSearch: onSearch,
+                    searchHistory: searchHistory,
+                    onClearHistory: onClearHistory,
+                  ),
+                ),
+                const SizedBox(width: 16),
                 TextButton.icon(
                   onPressed: onClearFilters,
                   icon: const Icon(Icons.clear_all),
@@ -99,11 +129,6 @@ class FilterBar extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Basic Filters',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 8),
         Wrap(
           spacing: 16,
           runSpacing: 16,
@@ -112,33 +137,166 @@ class FilterBar extends StatelessWidget {
             SizedBox(
               width: 200,
               child: DropdownButtonFormField<String>(
+                isExpanded: true,
                 decoration: const InputDecoration(
-                  labelText: 'Category',
-                  border: OutlineInputBorder(),
+                  labelText: 'Categories',
+                  border: UnderlineInputBorder(),
                 ),
-                value: selectedCategory,
-                items: [
-                  const DropdownMenuItem<String>(
-                    value: null,
-                    child: Text('All Categories'),
-                  ),
-                  ...categories.map((category) {
-                    return DropdownMenuItem<String>(
-                      value: category,
-                      child: Text(category),
-                    );
-                  }),
-                ],
-                onChanged: onCategoryChanged,
+                hint: const Text('Select Categories'),
+                value: null,
+                items: categories.map((category) {
+                  final isSelected = selectedCategories.contains(category);
+                  return DropdownMenuItem<String>(
+                    value: category,
+                    child: Row(
+                      children: [
+                        if (isSelected)
+                          const Icon(Icons.check, size: 20)
+                        else
+                          const SizedBox(width: 20),
+                        const SizedBox(width: 8),
+                        Expanded(child: Text(category)),
+                      ],
+                    ),
+                  );
+                }).toList(),
+                onChanged: (category) {
+                  if (category != null) {
+                    final newSelection = List<String>.from(selectedCategories);
+                    if (newSelection.contains(category)) {
+                      newSelection.remove(category);
+                    } else {
+                      newSelection.add(category);
+                    }
+                    onCategoriesChanged(newSelection);
+                  }
+                },
+                selectedItemBuilder: (context) {
+                  return [
+                    DropdownMenuItem<String>(
+                      value: null,
+                      child: Text(
+                        selectedCategories.isEmpty
+                            ? 'Select Categories'
+                            : '${selectedCategories.length} Selected',
+                      ),
+                    ),
+                  ];
+                },
               ),
             ),
-            // Date Range Filter
+            // Business Model Filter
+            SizedBox(
+              width: 250,
+              child: DropdownButtonFormField<String>(
+                isExpanded: true,
+                decoration: const InputDecoration(
+                  labelText: 'Business Models',
+                  border: UnderlineInputBorder(),
+                ),
+                hint: const Text('Select Business Models'),
+                value: null,
+                items: businessModels.map((model) {
+                  final isSelected = selectedBusinessModels.contains(model);
+                  return DropdownMenuItem<String>(
+                    value: model,
+                    child: Row(
+                      children: [
+                        if (isSelected)
+                          const Icon(Icons.check, size: 20)
+                        else
+                          const SizedBox(width: 20),
+                        const SizedBox(width: 8),
+                        Expanded(child: Text(model)),
+                      ],
+                    ),
+                  );
+                }).toList(),
+                onChanged: (model) {
+                  if (model != null) {
+                    final newSelection =
+                        List<String>.from(selectedBusinessModels);
+                    if (newSelection.contains(model)) {
+                      newSelection.remove(model);
+                    } else {
+                      newSelection.add(model);
+                    }
+                    onBusinessModelsChanged(newSelection);
+                  }
+                },
+                selectedItemBuilder: (context) {
+                  return [
+                    DropdownMenuItem<String>(
+                      value: null,
+                      child: Text(
+                        selectedBusinessModels.isEmpty
+                            ? 'Select Business Models'
+                            : '${selectedBusinessModels.length} Selected',
+                      ),
+                    ),
+                  ];
+                },
+              ),
+            ),
+            // Technology Stack Filter
+            SizedBox(
+              width: 200,
+              child: DropdownButtonFormField<String>(
+                isExpanded: true,
+                decoration: const InputDecoration(
+                  labelText: 'Technologies',
+                  border: UnderlineInputBorder(),
+                ),
+                hint: const Text('Select Technologies'),
+                value: null,
+                items: techStacks.map((tech) {
+                  final isSelected = selectedTechStacks.contains(tech);
+                  return DropdownMenuItem<String>(
+                    value: tech,
+                    child: Row(
+                      children: [
+                        if (isSelected)
+                          const Icon(Icons.check, size: 20)
+                        else
+                          const SizedBox(width: 20),
+                        const SizedBox(width: 8),
+                        Expanded(child: Text(tech)),
+                      ],
+                    ),
+                  );
+                }).toList(),
+                onChanged: (tech) {
+                  if (tech != null) {
+                    final newSelection = List<String>.from(selectedTechStacks);
+                    if (newSelection.contains(tech)) {
+                      newSelection.remove(tech);
+                    } else {
+                      newSelection.add(tech);
+                    }
+                    onTechStacksChanged(newSelection);
+                  }
+                },
+                selectedItemBuilder: (context) {
+                  return [
+                    DropdownMenuItem<String>(
+                      value: null,
+                      child: Text(
+                        selectedTechStacks.isEmpty
+                            ? 'Select Technologies'
+                            : '${selectedTechStacks.length} Selected',
+                      ),
+                    ),
+                  ];
+                },
+              ),
+            ),
+            // Start Date Filter
             SizedBox(
               width: 200,
               child: TextFormField(
                 decoration: const InputDecoration(
-                  labelText: 'Start Date',
-                  border: OutlineInputBorder(),
+                  labelText: 'Founded Date',
+                  border: UnderlineInputBorder(),
                   suffixIcon: Icon(Icons.calendar_today),
                 ),
                 readOnly: true,
@@ -160,92 +318,60 @@ class FilterBar extends StatelessWidget {
                 },
               ),
             ),
-            SizedBox(
-              width: 200,
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'End Date',
-                  border: OutlineInputBorder(),
-                  suffixIcon: Icon(Icons.calendar_today),
-                ),
-                readOnly: true,
-                controller: TextEditingController(
-                  text: endDate != null
-                      ? DateFormat.yMMMd().format(endDate!)
-                      : '',
-                ),
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: endDate ?? DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime.now(),
-                  );
-                  if (date != null) {
-                    onEndDateChanged(date);
-                  }
-                },
-              ),
-            ),
             // Revenue Range Filter
             SizedBox(
               width: 200,
-              child: TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Min Revenue',
-                  border: const OutlineInputBorder(),
-                  suffixText: currencyFormat.format(minRevenue ?? 0),
+              child: DropdownButtonFormField<RevenueRange>(
+                isExpanded: true,
+                decoration: const InputDecoration(
+                  labelText: 'Revenue',
+                  border: UnderlineInputBorder(),
                 ),
-                keyboardType: TextInputType.number,
-                onChanged: (value) {
-                  final revenue = double.tryParse(value);
-                  onMinRevenueChanged(revenue);
-                },
-              ),
-            ),
-            SizedBox(
-              width: 200,
-              child: TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Max Revenue',
-                  border: const OutlineInputBorder(),
-                  suffixText: currencyFormat.format(maxRevenue ?? 0),
+                hint: const Text('Select Revenue Range'),
+                value: revenueRanges.firstWhere(
+                  (range) => range.min == minRevenue && range.max == maxRevenue,
+                  orElse: () => revenueRanges.first,
                 ),
-                keyboardType: TextInputType.number,
-                onChanged: (value) {
-                  final revenue = double.tryParse(value);
-                  onMaxRevenueChanged(revenue);
+                items: revenueRanges.map((range) {
+                  return DropdownMenuItem<RevenueRange>(
+                    value: range,
+                    child: Text(range.label),
+                  );
+                }).toList(),
+                onChanged: (range) {
+                  if (range != null) {
+                    onMinRevenueChanged(range.min);
+                    onMaxRevenueChanged(range.max);
+                  }
                 },
               ),
             ),
             // Team Size Filter
             SizedBox(
               width: 200,
-              child: TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Min Team Size',
-                  border: const OutlineInputBorder(),
-                  suffixText: minTeamSize?.toString() ?? '0',
+              child: DropdownButtonFormField<TeamSizeRange>(
+                isExpanded: true,
+                decoration: const InputDecoration(
+                  labelText: 'Team Size',
+                  border: UnderlineInputBorder(),
                 ),
-                keyboardType: TextInputType.number,
-                onChanged: (value) {
-                  final size = int.tryParse(value);
-                  onMinTeamSizeChanged(size);
-                },
-              ),
-            ),
-            SizedBox(
-              width: 200,
-              child: TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Max Team Size',
-                  border: const OutlineInputBorder(),
-                  suffixText: maxTeamSize?.toString() ?? '0',
+                hint: const Text('Select Team Size'),
+                value: teamSizeRanges.firstWhere(
+                  (range) =>
+                      range.min == minTeamSize && range.max == maxTeamSize,
+                  orElse: () => teamSizeRanges.first,
                 ),
-                keyboardType: TextInputType.number,
-                onChanged: (value) {
-                  final size = int.tryParse(value);
-                  onMaxTeamSizeChanged(size);
+                items: teamSizeRanges.map((range) {
+                  return DropdownMenuItem<TeamSizeRange>(
+                    value: range,
+                    child: Text(range.label),
+                  );
+                }).toList(),
+                onChanged: (range) {
+                  if (range != null) {
+                    onMinTeamSizeChanged(range.min);
+                    onMaxTeamSizeChanged(range.max);
+                  }
                 },
               ),
             ),
@@ -259,74 +385,110 @@ class FilterBar extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Advanced Filters',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 8),
         Wrap(
           spacing: 16,
           runSpacing: 16,
           children: [
-            // Technology Stack Filter
-            SizedBox(
-              width: 300,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Technology Stack'),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: techStacks.map((tech) {
-                      final isSelected = selectedTechStacks.contains(tech);
-                      return FilterChip(
-                        label: Text(tech),
-                        selected: isSelected,
-                        onSelected: (selected) {
-                          final newSelection =
-                              List<String>.from(selectedTechStacks);
-                          if (selected) {
-                            newSelection.add(tech);
-                          } else {
-                            newSelection.remove(tech);
-                          }
-                          onTechStacksChanged(newSelection);
-                        },
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
-            ),
-            // Business Model Filter
-            SizedBox(
-              width: 200,
-              child: DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
-                  labelText: 'Business Model',
-                  border: OutlineInputBorder(),
+            // Selected Categories Display
+            if (selectedCategories.isNotEmpty)
+              SizedBox(
+                width: 300,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Selected Categories'),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: selectedCategories.map((category) {
+                        return Chip(
+                          label: Text(category),
+                          onDeleted: () {
+                            final newSelection =
+                                List<String>.from(selectedCategories);
+                            newSelection.remove(category);
+                            onCategoriesChanged(newSelection);
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ],
                 ),
-                value: selectedBusinessModel,
-                items: [
-                  const DropdownMenuItem<String>(
-                    value: null,
-                    child: Text('All Business Models'),
-                  ),
-                  ...businessModels.map((model) {
-                    return DropdownMenuItem<String>(
-                      value: model,
-                      child: Text(model),
-                    );
-                  }),
-                ],
-                onChanged: onBusinessModelChanged,
               ),
-            ),
+            // Selected Business Models Display
+            if (selectedBusinessModels.isNotEmpty)
+              SizedBox(
+                width: 300,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Selected Business Models'),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: selectedBusinessModels.map((model) {
+                        return Chip(
+                          label: Text(model),
+                          onDeleted: () {
+                            final newSelection =
+                                List<String>.from(selectedBusinessModels);
+                            newSelection.remove(model);
+                            onBusinessModelsChanged(newSelection);
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ),
+            // Selected Technology Stack Display
+            if (selectedTechStacks.isNotEmpty)
+              SizedBox(
+                width: 300,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Selected Technologies'),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: selectedTechStacks.map((tech) {
+                        return Chip(
+                          label: Text(tech),
+                          onDeleted: () {
+                            final newSelection =
+                                List<String>.from(selectedTechStacks);
+                            newSelection.remove(tech);
+                            onTechStacksChanged(newSelection);
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       ],
     );
   }
+}
+
+class RevenueRange {
+  final String label;
+  final double? min;
+  final double? max;
+
+  const RevenueRange(this.label, this.min, this.max);
+}
+
+class TeamSizeRange {
+  final String label;
+  final int? min;
+  final int? max;
+
+  const TeamSizeRange(this.label, this.min, this.max);
 }

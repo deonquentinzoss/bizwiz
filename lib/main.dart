@@ -47,21 +47,22 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final _companyService = CompanyService();
-  final _searchService = SearchService(CompanyService());
-  String? _selectedCategory;
+  final CompanyService _companyService = CompanyService();
+  final SearchService _searchService = SearchService(CompanyService());
+  String _searchQuery = '';
+  List<String> _searchHistory = [];
+  List<String> _selectedCategories = [];
   DateTime? _startDate;
-  DateTime? _endDate;
   double? _minRevenue;
   double? _maxRevenue;
   int? _minTeamSize;
   int? _maxTeamSize;
   List<String> _selectedTechStacks = [];
-  String? _selectedBusinessModel;
+  List<String> _selectedBusinessModels = [];
   SortField? _sortField;
   SortOrder _sortOrder = SortOrder.ascending;
-  String _searchQuery = '';
-  List<Company> _searchResults = [];
+  bool _isLoading = false;
+  String? _error;
 
   List<String> get _categories {
     final allCategories = _companyService
@@ -75,59 +76,29 @@ class _HomePageState extends State<HomePage> {
   List<String> get _businessModels => _companyService.getAllBusinessModels();
 
   List<Company> get _filteredAndSortedCompanies {
-    var companies = _searchQuery.isNotEmpty
-        ? _searchResults
-        : _companyService.filterCompanies(
-            category: _selectedCategory,
-            startDate: _startDate,
-            endDate: _endDate,
-            minRevenue: _minRevenue,
-            maxRevenue: _maxRevenue,
-            minTeamSize: _minTeamSize,
-            maxTeamSize: _maxTeamSize,
-            techStacks:
-                _selectedTechStacks.isNotEmpty ? _selectedTechStacks : null,
-            businessModel: _selectedBusinessModel,
-          );
-
-    if (_sortField != null) {
-      companies = _companyService.sortCompanies(
-        companies,
-        field: _sortField!,
-        order: _sortOrder,
-      );
-    }
-
-    return companies;
-  }
-
-  void _handleSearch(String query) {
-    setState(() {
-      _searchQuery = query;
-      _searchResults = _searchService.search(
-        query,
-        category: _selectedCategory,
-        techStacks: _selectedTechStacks.isNotEmpty ? _selectedTechStacks : null,
-        businessModel: _selectedBusinessModel,
-      );
-    });
+    return _companyService.filterCompanies(
+      categories: _selectedCategories,
+      startDate: _startDate,
+      minRevenue: _minRevenue,
+      maxRevenue: _maxRevenue,
+      minTeamSize: _minTeamSize,
+      maxTeamSize: _maxTeamSize,
+      techStacks: _selectedTechStacks,
+      businessModels: _selectedBusinessModels,
+    );
   }
 
   void _clearFilters() {
     setState(() {
-      _selectedCategory = null;
+      _searchQuery = '';
+      _selectedCategories = [];
       _startDate = null;
-      _endDate = null;
       _minRevenue = null;
       _maxRevenue = null;
       _minTeamSize = null;
       _maxTeamSize = null;
       _selectedTechStacks = [];
-      _selectedBusinessModel = null;
-      _sortField = null;
-      _sortOrder = SortOrder.ascending;
-      _searchQuery = '';
-      _searchResults = [];
+      _selectedBusinessModels = [];
     });
   }
 
@@ -136,67 +107,121 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('BizWiz'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
-      body: Column(
-        children: [
-          CustomSearchBar(
-            onSearch: _handleSearch,
-            searchHistory: _searchService.getSearchHistory(),
-            onClearHistory: () {
-              setState(() {
-                _searchService.clearSearchHistory();
-              });
-            },
-          ),
-          FilterBar(
-            categories: _categories,
-            techStacks: _techStacks,
-            businessModels: _businessModels,
-            selectedCategory: _selectedCategory,
-            startDate: _startDate,
-            endDate: _endDate,
-            minRevenue: _minRevenue,
-            maxRevenue: _maxRevenue,
-            minTeamSize: _minTeamSize,
-            maxTeamSize: _maxTeamSize,
-            selectedTechStacks: _selectedTechStacks,
-            selectedBusinessModel: _selectedBusinessModel,
-            onCategoryChanged: (category) =>
-                setState(() => _selectedCategory = category),
-            onStartDateChanged: (date) => setState(() => _startDate = date),
-            onEndDateChanged: (date) => setState(() => _endDate = date),
-            onMinRevenueChanged: (revenue) =>
-                setState(() => _minRevenue = revenue),
-            onMaxRevenueChanged: (revenue) =>
-                setState(() => _maxRevenue = revenue),
-            onMinTeamSizeChanged: (size) => setState(() => _minTeamSize = size),
-            onMaxTeamSizeChanged: (size) => setState(() => _maxTeamSize = size),
-            onTechStacksChanged: (stacks) =>
-                setState(() => _selectedTechStacks = stacks),
-            onBusinessModelChanged: (model) =>
-                setState(() => _selectedBusinessModel = model),
-            onClearFilters: _clearFilters,
-          ),
-          SortBar(
-            selectedField: _sortField,
-            sortOrder: _sortOrder,
-            onFieldChanged: (field) => setState(() => _sortField = field),
-            onOrderChanged: (order) => setState(() => _sortOrder = order),
-          ),
-          Expanded(
-            child: CompanyGrid(
-              companies: _filteredAndSortedCompanies,
-              onCompanyTap: (company) {
-                showDialog(
-                  context: context,
-                  builder: (context) => CompanyDetailsDialog(company: company),
-                );
-              },
-            ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _loadCompanies,
           ),
         ],
       ),
+      body: _error != null
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(_error!),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _loadCompanies,
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            )
+          : Column(
+              children: [
+                FilterBar(
+                  categories: _categories,
+                  techStacks: _techStacks,
+                  businessModels: _businessModels,
+                  selectedCategories: _selectedCategories,
+                  startDate: _startDate,
+                  minRevenue: _minRevenue,
+                  maxRevenue: _maxRevenue,
+                  minTeamSize: _minTeamSize,
+                  maxTeamSize: _maxTeamSize,
+                  selectedTechStacks: _selectedTechStacks,
+                  selectedBusinessModels: _selectedBusinessModels,
+                  onCategoriesChanged: (categories) {
+                    setState(() {
+                      _selectedCategories = categories;
+                    });
+                  },
+                  onStartDateChanged: (date) {
+                    setState(() {
+                      _startDate = date;
+                    });
+                  },
+                  onMinRevenueChanged: (revenue) {
+                    setState(() {
+                      _minRevenue = revenue;
+                    });
+                  },
+                  onMaxRevenueChanged: (revenue) {
+                    setState(() {
+                      _maxRevenue = revenue;
+                    });
+                  },
+                  onMinTeamSizeChanged: (size) {
+                    setState(() {
+                      _minTeamSize = size;
+                    });
+                  },
+                  onMaxTeamSizeChanged: (size) {
+                    setState(() {
+                      _maxTeamSize = size;
+                    });
+                  },
+                  onTechStacksChanged: (stacks) {
+                    setState(() {
+                      _selectedTechStacks = stacks;
+                    });
+                  },
+                  onBusinessModelsChanged: (models) {
+                    setState(() {
+                      _selectedBusinessModels = models;
+                    });
+                  },
+                  onClearFilters: _clearFilters,
+                  onSearch: (query) {
+                    setState(() {
+                      _searchQuery = query;
+                      if (query.isNotEmpty && !_searchHistory.contains(query)) {
+                        _searchHistory.add(query);
+                      }
+                    });
+                  },
+                  searchHistory: _searchHistory,
+                  onClearHistory: () {
+                    setState(() {
+                      _searchHistory.clear();
+                    });
+                  },
+                ),
+                SortBar(
+                  selectedField: _sortField,
+                  sortOrder: _sortOrder,
+                  onFieldChanged: (field) => setState(() => _sortField = field),
+                  onOrderChanged: (order) => setState(() => _sortOrder = order),
+                ),
+                Expanded(
+                  child: CompanyGrid(
+                    companies: _filteredAndSortedCompanies,
+                    onCompanyTap: (company) {
+                      showDialog(
+                        context: context,
+                        builder: (context) =>
+                            CompanyDetailsDialog(company: company),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
     );
+  }
+
+  void _loadCompanies() {
+    // Implementation of _loadCompanies method
   }
 }
