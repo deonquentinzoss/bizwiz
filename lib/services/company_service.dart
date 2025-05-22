@@ -1,5 +1,6 @@
 import '../models/company.dart';
 import '../data/mock_companies.dart';
+import '../widgets/sort_bar.dart';
 
 class CompanyService {
   List<Company> _companies = [];
@@ -69,27 +70,26 @@ class CompanyService {
     }).toList();
   }
 
-  List<Company> sortCompanies({
-    required String sortBy,
-    bool ascending = true,
+  List<Company> sortCompanies(
+    List<Company> companies, {
+    required SortField field,
+    required SortOrder order,
   }) {
-    final sorted = List<Company>.from(_companies);
+    final sorted = List<Company>.from(companies);
     sorted.sort((a, b) {
       int comparison;
-      switch (sortBy) {
-        case 'date':
+      switch (field) {
+        case SortField.date:
           comparison = a.startDate.compareTo(b.startDate);
           break;
-        case 'revenue':
+        case SortField.revenue:
           comparison = a.revenue.mrr.compareTo(b.revenue.mrr);
           break;
-        case 'teamSize':
+        case SortField.teamSize:
           comparison = a.teamSize.compareTo(b.teamSize);
           break;
-        default:
-          comparison = 0;
       }
-      return ascending ? comparison : -comparison;
+      return order == SortOrder.ascending ? comparison : -comparison;
     });
     return sorted;
   }

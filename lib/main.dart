@@ -3,6 +3,7 @@ import 'services/company_service.dart';
 import 'widgets/company_grid.dart';
 import 'widgets/company_details_dialog.dart';
 import 'widgets/filter_bar.dart';
+import 'widgets/sort_bar.dart';
 import 'models/company.dart';
 
 void main() {
@@ -52,6 +53,8 @@ class _HomePageState extends State<HomePage> {
   double? _maxRevenue;
   int? _minTeamSize;
   int? _maxTeamSize;
+  SortField? _sortField;
+  SortOrder _sortOrder = SortOrder.ascending;
 
   List<String> get _categories {
     final allCategories = _companyService
@@ -61,8 +64,8 @@ class _HomePageState extends State<HomePage> {
     return allCategories.toList()..sort();
   }
 
-  List<Company> get _filteredCompanies {
-    return _companyService.filterCompanies(
+  List<Company> get _filteredAndSortedCompanies {
+    var companies = _companyService.filterCompanies(
       category: _selectedCategory,
       startDate: _startDate,
       endDate: _endDate,
@@ -71,6 +74,16 @@ class _HomePageState extends State<HomePage> {
       minTeamSize: _minTeamSize,
       maxTeamSize: _maxTeamSize,
     );
+
+    if (_sortField != null) {
+      companies = _companyService.sortCompanies(
+        companies,
+        field: _sortField!,
+        order: _sortOrder,
+      );
+    }
+
+    return companies;
   }
 
   void _clearFilters() {
@@ -82,6 +95,8 @@ class _HomePageState extends State<HomePage> {
       _maxRevenue = null;
       _minTeamSize = null;
       _maxTeamSize = null;
+      _sortField = null;
+      _sortOrder = SortOrder.ascending;
     });
   }
 
@@ -115,9 +130,15 @@ class _HomePageState extends State<HomePage> {
             onMaxTeamSizeChanged: (size) => setState(() => _maxTeamSize = size),
             onClearFilters: _clearFilters,
           ),
+          SortBar(
+            selectedField: _sortField,
+            sortOrder: _sortOrder,
+            onFieldChanged: (field) => setState(() => _sortField = field),
+            onOrderChanged: (order) => setState(() => _sortOrder = order),
+          ),
           Expanded(
             child: CompanyGrid(
-              companies: _filteredCompanies,
+              companies: _filteredAndSortedCompanies,
               onCompanyTap: (company) {
                 showDialog(
                   context: context,
