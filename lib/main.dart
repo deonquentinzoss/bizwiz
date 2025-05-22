@@ -53,6 +53,8 @@ class _HomePageState extends State<HomePage> {
   double? _maxRevenue;
   int? _minTeamSize;
   int? _maxTeamSize;
+  List<String> _selectedTechStacks = [];
+  String? _selectedBusinessModel;
   SortField? _sortField;
   SortOrder _sortOrder = SortOrder.ascending;
 
@@ -64,6 +66,9 @@ class _HomePageState extends State<HomePage> {
     return allCategories.toList()..sort();
   }
 
+  List<String> get _techStacks => _companyService.getAllTechStacks();
+  List<String> get _businessModels => _companyService.getAllBusinessModels();
+
   List<Company> get _filteredAndSortedCompanies {
     var companies = _companyService.filterCompanies(
       category: _selectedCategory,
@@ -73,6 +78,8 @@ class _HomePageState extends State<HomePage> {
       maxRevenue: _maxRevenue,
       minTeamSize: _minTeamSize,
       maxTeamSize: _maxTeamSize,
+      techStacks: _selectedTechStacks.isNotEmpty ? _selectedTechStacks : null,
+      businessModel: _selectedBusinessModel,
     );
 
     if (_sortField != null) {
@@ -95,6 +102,8 @@ class _HomePageState extends State<HomePage> {
       _maxRevenue = null;
       _minTeamSize = null;
       _maxTeamSize = null;
+      _selectedTechStacks = [];
+      _selectedBusinessModel = null;
       _sortField = null;
       _sortOrder = SortOrder.ascending;
     });
@@ -111,6 +120,8 @@ class _HomePageState extends State<HomePage> {
         children: [
           FilterBar(
             categories: _categories,
+            techStacks: _techStacks,
+            businessModels: _businessModels,
             selectedCategory: _selectedCategory,
             startDate: _startDate,
             endDate: _endDate,
@@ -118,6 +129,8 @@ class _HomePageState extends State<HomePage> {
             maxRevenue: _maxRevenue,
             minTeamSize: _minTeamSize,
             maxTeamSize: _maxTeamSize,
+            selectedTechStacks: _selectedTechStacks,
+            selectedBusinessModel: _selectedBusinessModel,
             onCategoryChanged: (category) =>
                 setState(() => _selectedCategory = category),
             onStartDateChanged: (date) => setState(() => _startDate = date),
@@ -128,6 +141,10 @@ class _HomePageState extends State<HomePage> {
                 setState(() => _maxRevenue = revenue),
             onMinTeamSizeChanged: (size) => setState(() => _minTeamSize = size),
             onMaxTeamSizeChanged: (size) => setState(() => _maxTeamSize = size),
+            onTechStacksChanged: (stacks) =>
+                setState(() => _selectedTechStacks = stacks),
+            onBusinessModelChanged: (model) =>
+                setState(() => _selectedBusinessModel = model),
             onClearFilters: _clearFilters,
           ),
           SortBar(

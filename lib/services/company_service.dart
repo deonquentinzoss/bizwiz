@@ -4,6 +4,7 @@ import '../widgets/sort_bar.dart';
 
 class CompanyService {
   List<Company> _companies = [];
+  final Map<String, dynamic> _filterState = {};
 
   CompanyService() {
     _companies = List.from(mockCompanies);
@@ -31,6 +32,27 @@ class CompanyService {
         .toList();
   }
 
+  List<String> getAllTechStacks() {
+    final allTechStacks =
+        _companies.expand((company) => company.techStack).toSet();
+    return allTechStacks.toList()..sort();
+  }
+
+  List<String> getAllBusinessModels() {
+    final allBusinessModels =
+        _companies.map((company) => company.businessModel).toSet();
+    return allBusinessModels.toList()..sort();
+  }
+
+  void saveFilterState(Map<String, dynamic> state) {
+    _filterState.clear();
+    _filterState.addAll(state);
+  }
+
+  Map<String, dynamic> getFilterState() {
+    return Map.from(_filterState);
+  }
+
   List<Company> filterCompanies({
     String? category,
     DateTime? startDate,
@@ -39,9 +61,11 @@ class CompanyService {
     double? maxRevenue,
     int? minTeamSize,
     int? maxTeamSize,
-    String? techStack,
+    List<String>? techStacks,
+    String? businessModel,
   }) {
     return _companies.where((company) {
+      // Basic filters
       if (category != null && !company.category.contains(category)) {
         return false;
       }
@@ -63,9 +87,17 @@ class CompanyService {
       if (maxTeamSize != null && company.teamSize > maxTeamSize) {
         return false;
       }
-      if (techStack != null && !company.techStack.contains(techStack)) {
+
+      // Advanced filters
+      if (techStacks != null && techStacks.isNotEmpty) {
+        if (!techStacks.every((tech) => company.techStack.contains(tech))) {
+          return false;
+        }
+      }
+      if (businessModel != null && company.businessModel != businessModel) {
         return false;
       }
+
       return true;
     }).toList();
   }
