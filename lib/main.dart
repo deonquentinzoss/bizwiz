@@ -221,15 +221,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('BizWiz'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadCompanies,
-          ),
-        ],
-      ),
       body: _error != null
           ? Center(
               child: Column(
@@ -246,73 +237,94 @@ class _HomePageState extends State<HomePage> {
             )
           : Column(
               children: [
-                FilterBar(
-                  categories: _categories,
-                  techStacks: _techStacks,
-                  businessModels: _businessModels,
-                  selectedCategories: _selectedCategories,
-                  startDate: _startDate,
-                  minRevenue: _minRevenue,
-                  maxRevenue: _maxRevenue,
-                  minTeamSize: _minTeamSize,
-                  maxTeamSize: _maxTeamSize,
-                  selectedTechStacks: _selectedTechStacks,
-                  selectedBusinessModels: _selectedBusinessModels,
-                  onCategoriesChanged: (categories) {
-                    setState(() {
-                      _selectedCategories = categories;
-                    });
-                  },
-                  onStartDateChanged: (date) {
-                    setState(() {
-                      _startDate = date;
-                    });
-                  },
-                  onMinRevenueChanged: (revenue) {
-                    setState(() {
-                      _minRevenue = revenue;
-                    });
-                  },
-                  onMaxRevenueChanged: (revenue) {
-                    setState(() {
-                      _maxRevenue = revenue;
-                    });
-                  },
-                  onMinTeamSizeChanged: (size) {
-                    setState(() {
-                      _minTeamSize = size;
-                    });
-                  },
-                  onMaxTeamSizeChanged: (size) {
-                    setState(() {
-                      _maxTeamSize = size;
-                    });
-                  },
-                  onTechStacksChanged: (stacks) {
-                    setState(() {
-                      _selectedTechStacks = stacks;
-                    });
-                  },
-                  onBusinessModelsChanged: (models) {
-                    setState(() {
-                      _selectedBusinessModels = models;
-                    });
-                  },
-                  onClearFilters: _clearFilters,
-                  onSearch: (query) {
-                    setState(() {
-                      _searchQuery = query;
-                      if (query.isNotEmpty && !_searchHistory.contains(query)) {
-                        _searchHistory.add(query);
-                      }
-                    });
-                  },
-                  searchHistory: _searchHistory,
-                  onClearHistory: () {
-                    setState(() {
-                      _searchHistory.clear();
-                    });
-                  },
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  child: Row(
+                    children: [
+                      Text(
+                        'BizWiz',
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: FilterBar(
+                          categories: _categories,
+                          techStacks: _techStacks,
+                          businessModels: _businessModels,
+                          selectedCategories: _selectedCategories,
+                          startDate: _startDate,
+                          minRevenue: _minRevenue,
+                          maxRevenue: _maxRevenue,
+                          minTeamSize: _minTeamSize,
+                          maxTeamSize: _maxTeamSize,
+                          selectedTechStacks: _selectedTechStacks,
+                          selectedBusinessModels: _selectedBusinessModels,
+                          onCategoriesChanged: (categories) {
+                            setState(() {
+                              _selectedCategories = categories;
+                            });
+                          },
+                          onStartDateChanged: (date) {
+                            setState(() {
+                              _startDate = date;
+                            });
+                          },
+                          onMinRevenueChanged: (revenue) {
+                            setState(() {
+                              _minRevenue = revenue;
+                            });
+                          },
+                          onMaxRevenueChanged: (revenue) {
+                            setState(() {
+                              _maxRevenue = revenue;
+                            });
+                          },
+                          onMinTeamSizeChanged: (size) {
+                            setState(() {
+                              _minTeamSize = size;
+                            });
+                          },
+                          onMaxTeamSizeChanged: (size) {
+                            setState(() {
+                              _maxTeamSize = size;
+                            });
+                          },
+                          onTechStacksChanged: (stacks) {
+                            setState(() {
+                              _selectedTechStacks = stacks;
+                            });
+                          },
+                          onBusinessModelsChanged: (models) {
+                            setState(() {
+                              _selectedBusinessModels = models;
+                            });
+                          },
+                          onClearFilters: _clearFilters,
+                          onSearch: (query) {
+                            setState(() {
+                              _searchQuery = query;
+                              if (query.isNotEmpty &&
+                                  !_searchHistory.contains(query)) {
+                                _searchHistory.add(query);
+                              }
+                            });
+                          },
+                          searchHistory: _searchHistory,
+                          onClearHistory: () {
+                            setState(() {
+                              _searchHistory.clear();
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 SortBar(
                   selectedField: _sortField,

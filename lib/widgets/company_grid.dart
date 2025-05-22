@@ -14,28 +14,37 @@ class CompanyGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Calculate the number of columns based on the available width
-        final width = constraints.maxWidth;
-        final crossAxisCount = (width / 400).floor().clamp(1, 4);
+    final width = MediaQuery.of(context).size.width;
+    final isMobile = width < 600;
+    final isTablet = width >= 600 && width < 1200;
 
-        return GridView.builder(
-          padding: const EdgeInsets.all(16),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            childAspectRatio: 0.75,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-          ),
-          itemCount: companies.length,
-          itemBuilder: (context, index) {
-            final company = companies[index];
-            return CompanyCard(
-              company: company,
-              onTap: () => onCompanyTap(company),
-            );
-          },
+    // Calculate number of columns based on screen width
+    int crossAxisCount;
+    if (isMobile) {
+      crossAxisCount = 1;
+    } else if (isTablet) {
+      crossAxisCount = 2;
+    } else {
+      crossAxisCount = 3;
+    }
+
+    // Calculate child aspect ratio based on screen size
+    final childAspectRatio = isMobile ? 0.85 : 0.75;
+
+    return GridView.builder(
+      padding: EdgeInsets.all(isMobile ? 8 : 16),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        childAspectRatio: childAspectRatio,
+        crossAxisSpacing: isMobile ? 8 : 16,
+        mainAxisSpacing: isMobile ? 8 : 16,
+      ),
+      itemCount: companies.length,
+      itemBuilder: (context, index) {
+        final company = companies[index];
+        return CompanyCard(
+          company: company,
+          onTap: () => onCompanyTap(company),
         );
       },
     );

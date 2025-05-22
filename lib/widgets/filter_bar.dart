@@ -78,64 +78,87 @@ class FilterBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Theme.of(context);
+    final theme = Theme.of(context);
     final currencyFormat = NumberFormat.compactCurrency(symbol: '\$');
+    final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Card(
-      margin: const EdgeInsets.all(16),
+      margin: EdgeInsets.all(isMobile ? 8 : 16),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(isMobile ? 8 : 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Wrap(
-                    spacing: 16,
-                    runSpacing: 16,
-                    children: [
-                      // Basic Filters
-                      _buildBasicFilters(context, currencyFormat),
-                      // Clear All Button
-                      TextButton.icon(
-                        onPressed: onClearFilters,
-                        icon: const Icon(Icons.clear_all),
-                        label: const Text('Clear All'),
-                      ),
-                    ],
-                  ),
+            if (isMobile) ...[
+              // Mobile: Search bar on top
+              CustomSearchBar(
+                onSearch: onSearch,
+                searchHistory: searchHistory,
+                onClearHistory: onClearHistory,
+              ),
+              const SizedBox(height: 16),
+              // Mobile: Basic filters in a column
+              _buildBasicFilters(context, currencyFormat, isMobile: true),
+              const SizedBox(height: 8),
+              // Mobile: Clear button
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton.icon(
+                  onPressed: onClearFilters,
+                  icon: const Icon(Icons.clear_all),
+                  label: const Text('Clear All'),
                 ),
-                const SizedBox(width: 16),
-                // Search Bar
-                SizedBox(
-                  width: 300,
-                  child: CustomSearchBar(
-                    onSearch: onSearch,
-                    searchHistory: searchHistory,
-                    onClearHistory: onClearHistory,
+              ),
+            ] else ...[
+              // Desktop: All filters in a single row
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Wrap(
+                      spacing: 16,
+                      runSpacing: 16,
+                      children: [
+                        _buildBasicFilters(context, currencyFormat),
+                        _buildAdvancedFilters(context),
+                        TextButton.icon(
+                          onPressed: onClearFilters,
+                          icon: const Icon(Icons.clear_all),
+                          label: const Text('Clear All'),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            // Advanced Filters
-            _buildAdvancedFilters(context),
+                  const SizedBox(width: 16),
+                  SizedBox(
+                    width: 300,
+                    child: CustomSearchBar(
+                      onSearch: onSearch,
+                      searchHistory: searchHistory,
+                      onClearHistory: onClearHistory,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBasicFilters(BuildContext context, NumberFormat currencyFormat) {
+  Widget _buildBasicFilters(BuildContext context, NumberFormat currencyFormat,
+      {bool isMobile = false}) {
+    final filterWidth = isMobile ? double.infinity : 200.0;
+    final businessModelWidth = isMobile ? double.infinity : 250.0;
+
     return Wrap(
-      spacing: 16,
-      runSpacing: 16,
+      spacing: isMobile ? 0 : 16,
+      runSpacing: isMobile ? 16 : 16,
       children: [
         // Category Filter
         SizedBox(
-          width: 200,
+          width: filterWidth,
           child: DropdownButtonFormField<String>(
             isExpanded: true,
             decoration: const InputDecoration(
@@ -187,7 +210,7 @@ class FilterBar extends StatelessWidget {
         ),
         // Business Model Filter
         SizedBox(
-          width: 250,
+          width: businessModelWidth,
           child: DropdownButtonFormField<String>(
             isExpanded: true,
             decoration: const InputDecoration(
@@ -239,7 +262,7 @@ class FilterBar extends StatelessWidget {
         ),
         // Technology Stack Filter
         SizedBox(
-          width: 200,
+          width: filterWidth,
           child: DropdownButtonFormField<String>(
             isExpanded: true,
             decoration: const InputDecoration(
@@ -289,20 +312,29 @@ class FilterBar extends StatelessWidget {
             },
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildAdvancedFilters(BuildContext context) {
+    return Wrap(
+      spacing: 16,
+      runSpacing: 16,
+      children: [
         // Start Date Filter
         SizedBox(
           width: 200,
           child: TextFormField(
+            readOnly: true,
             decoration: const InputDecoration(
-              labelText: 'Founded Date',
+              labelText: 'Start Date',
               border: UnderlineInputBorder(),
               suffixIcon: Icon(Icons.calendar_today),
             ),
-            readOnly: true,
             controller: TextEditingController(
               text: startDate != null
                   ? DateFormat.yMMMd().format(startDate!)
-                  : '',
+                  : 'Any Date',
             ),
             onTap: () async {
               final date = await showDatePicker(
@@ -326,9 +358,10 @@ class FilterBar extends StatelessWidget {
               labelText: 'Revenue',
               border: UnderlineInputBorder(),
             ),
-            hint: const Text('Select Revenue Range'),
             value: revenueRanges.firstWhere(
-              (range) => range.min == minRevenue && range.max == maxRevenue,
+              (range) =>
+                  range.minRevenue == minRevenue &&
+                  range.maxRevenue == maxRevenue,
               orElse: () => revenueRanges.first,
             ),
             items: revenueRanges.map((range) {
@@ -339,13 +372,13 @@ class FilterBar extends StatelessWidget {
             }).toList(),
             onChanged: (range) {
               if (range != null) {
-                onMinRevenueChanged(range.min);
-                onMaxRevenueChanged(range.max);
+                onMinRevenueChanged(range.minRevenue);
+                onMaxRevenueChanged(range.maxRevenue);
               }
             },
           ),
         ),
-        // Team Size Filter
+        // Team Size Range Filter
         SizedBox(
           width: 200,
           child: DropdownButtonFormField<TeamSizeRange>(
@@ -354,9 +387,9 @@ class FilterBar extends StatelessWidget {
               labelText: 'Team Size',
               border: UnderlineInputBorder(),
             ),
-            hint: const Text('Select Team Size'),
             value: teamSizeRanges.firstWhere(
-              (range) => range.min == minTeamSize && range.max == maxTeamSize,
+              (range) =>
+                  range.minSize == minTeamSize && range.maxSize == maxTeamSize,
               orElse: () => teamSizeRanges.first,
             ),
             items: teamSizeRanges.map((range) {
@@ -367,106 +400,11 @@ class FilterBar extends StatelessWidget {
             }).toList(),
             onChanged: (range) {
               if (range != null) {
-                onMinTeamSizeChanged(range.min);
-                onMaxTeamSizeChanged(range.max);
+                onMinTeamSizeChanged(range.minSize);
+                onMaxTeamSizeChanged(range.maxSize);
               }
             },
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAdvancedFilters(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Wrap(
-          spacing: 16,
-          runSpacing: 16,
-          children: [
-            // Selected Categories Display
-            if (selectedCategories.isNotEmpty)
-              SizedBox(
-                width: 300,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Selected Categories'),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: selectedCategories.map((category) {
-                        return Chip(
-                          label: Text(category),
-                          onDeleted: () {
-                            final newSelection =
-                                List<String>.from(selectedCategories);
-                            newSelection.remove(category);
-                            onCategoriesChanged(newSelection);
-                          },
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ),
-              ),
-            // Selected Business Models Display
-            if (selectedBusinessModels.isNotEmpty)
-              SizedBox(
-                width: 300,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Selected Business Models'),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: selectedBusinessModels.map((model) {
-                        return Chip(
-                          label: Text(model),
-                          onDeleted: () {
-                            final newSelection =
-                                List<String>.from(selectedBusinessModels);
-                            newSelection.remove(model);
-                            onBusinessModelsChanged(newSelection);
-                          },
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ),
-              ),
-            // Selected Technology Stack Display
-            if (selectedTechStacks.isNotEmpty)
-              SizedBox(
-                width: 300,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Selected Technologies'),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: selectedTechStacks.map((tech) {
-                        return Chip(
-                          label: Text(tech),
-                          onDeleted: () {
-                            final newSelection =
-                                List<String>.from(selectedTechStacks);
-                            newSelection.remove(tech);
-                            onTechStacksChanged(newSelection);
-                          },
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ),
-              ),
-          ],
         ),
       ],
     );
@@ -475,16 +413,16 @@ class FilterBar extends StatelessWidget {
 
 class RevenueRange {
   final String label;
-  final double? min;
-  final double? max;
+  final double? minRevenue;
+  final double? maxRevenue;
 
-  const RevenueRange(this.label, this.min, this.max);
+  const RevenueRange(this.label, this.minRevenue, this.maxRevenue);
 }
 
 class TeamSizeRange {
   final String label;
-  final int? min;
-  final int? max;
+  final int? minSize;
+  final int? maxSize;
 
-  const TeamSizeRange(this.label, this.min, this.max);
+  const TeamSizeRange(this.label, this.minSize, this.maxSize);
 }
