@@ -146,7 +146,6 @@ class CompanyService {
   List<Company> filterCompanies({
     List<String>? categories,
     DateTime? startDate,
-    DateTime? endDate,
     double? minRevenue,
     double? maxRevenue,
     int? minTeamSize,
@@ -154,41 +153,49 @@ class CompanyService {
     List<String>? techStacks,
     List<String>? businessModels,
   }) {
+    // Create sets for faster lookups
+    final categorySet = categories?.toSet();
+    final techStackSet = techStacks?.toSet();
+    final businessModelSet = businessModels?.toSet();
+
     return _companies.where((company) {
       // Basic filters
-      if (categories != null && categories.isNotEmpty) {
-        if (!categories
-            .any((category) => company.category.contains(category))) {
+      if (categorySet != null && categorySet.isNotEmpty) {
+        if (!company.category
+            .any((category) => categorySet.contains(category))) {
           return false;
         }
       }
+
       if (startDate != null && company.startDate.isBefore(startDate)) {
         return false;
       }
-      if (endDate != null && company.startDate.isAfter(endDate)) {
-        return false;
-      }
+
       if (minRevenue != null && company.revenue.mrr < minRevenue) {
         return false;
       }
+
       if (maxRevenue != null && company.revenue.mrr > maxRevenue) {
         return false;
       }
+
       if (minTeamSize != null && company.teamSize < minTeamSize) {
         return false;
       }
+
       if (maxTeamSize != null && company.teamSize > maxTeamSize) {
         return false;
       }
 
       // Advanced filters
-      if (techStacks != null && techStacks.isNotEmpty) {
-        if (!techStacks.every((tech) => company.techStack.contains(tech))) {
+      if (techStackSet != null && techStackSet.isNotEmpty) {
+        if (!techStackSet.every((tech) => company.techStack.contains(tech))) {
           return false;
         }
       }
-      if (businessModels != null && businessModels.isNotEmpty) {
-        if (!businessModels.contains(company.businessModel)) {
+
+      if (businessModelSet != null && businessModelSet.isNotEmpty) {
+        if (!businessModelSet.contains(company.businessModel)) {
           return false;
         }
       }

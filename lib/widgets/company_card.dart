@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/company.dart';
 import 'package:intl/intl.dart';
 import '../utils/animations.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class CompanyCard extends StatelessWidget {
   final Company company;
@@ -33,35 +34,25 @@ class CompanyCard extends StatelessWidget {
                   // Company Logo
                   AspectRatio(
                     aspectRatio: 16 / 9,
-                    child: Image.network(
-                      company.logo,
+                    child: CachedNetworkImage(
+                      imageUrl: company.logo,
                       fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Container(
-                          color: theme.colorScheme.surfaceContainerHighest,
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                  : null,
-                            ),
+                      placeholder: (context, url) => Container(
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        child: Center(
+                          child: Icon(
+                            Icons.business,
+                            size: 48,
+                            color: theme.colorScheme.primary,
                           ),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: theme.colorScheme.surfaceContainerHighest,
-                          child: Center(
-                            child: Icon(
-                              Icons.business,
-                              size: 48,
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                        );
-                      },
+                        ),
+                      ),
                     ),
                   ),
                   Padding(

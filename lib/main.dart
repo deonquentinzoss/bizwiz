@@ -59,19 +59,74 @@ class _HomePageState extends State<HomePage> {
   SortOrder _sortOrder = SortOrder.ascending;
   String? _error;
 
+  // Cache for derived data
+  List<String>? _cachedCategories;
+  List<String>? _cachedTechStacks;
+  List<String>? _cachedBusinessModels;
+  List<Company>? _cachedFilteredCompanies;
+  Map<String, dynamic>? _lastFilterState;
+
   List<String> get _categories {
-    final allCategories = _companyService
+    _cachedCategories ??= _companyService
         .getAllCompanies()
         .expand((company) => company.category)
-        .toSet();
-    return allCategories.toList()..sort();
+        .toSet()
+        .toList()
+      ..sort();
+    return _cachedCategories!;
   }
 
-  List<String> get _techStacks => _companyService.getAllTechStacks();
-  List<String> get _businessModels => _companyService.getAllBusinessModels();
+  List<String> get _techStacks {
+    _cachedTechStacks ??= _companyService.getAllTechStacks();
+    return _cachedTechStacks!;
+  }
+
+  List<String> get _businessModels {
+    _cachedBusinessModels ??= _companyService.getAllBusinessModels();
+    return _cachedBusinessModels!;
+  }
+
+  bool _listEquals<T>(List<T> list1, List<T> list2) {
+    if (list1.length != list2.length) return false;
+    for (int i = 0; i < list1.length; i++) {
+      if (list1[i] != list2[i]) return false;
+    }
+    return true;
+  }
+
+  bool _mapEquals(Map<String, dynamic> map1, Map<String, dynamic> map2) {
+    if (map1.length != map2.length) return false;
+    return map1.entries.every((entry) {
+      final value2 = map2[entry.key];
+      if (entry.value is List && value2 is List) {
+        return _listEquals(entry.value, value2);
+      }
+      return entry.value == value2;
+    });
+  }
 
   List<Company> get _filteredAndSortedCompanies {
-    return _companyService.filterCompanies(
+    // Check if filters have changed
+    final currentFilterState = {
+      'categories': _selectedCategories,
+      'startDate': _startDate,
+      'minRevenue': _minRevenue,
+      'maxRevenue': _maxRevenue,
+      'minTeamSize': _minTeamSize,
+      'maxTeamSize': _maxTeamSize,
+      'techStacks': _selectedTechStacks,
+      'businessModels': _selectedBusinessModels,
+    };
+
+    // If filters haven't changed, return cached result
+    if (_lastFilterState != null &&
+        _mapEquals(_lastFilterState!, currentFilterState)) {
+      return _cachedFilteredCompanies!;
+    }
+
+    // Update cache
+    _lastFilterState = currentFilterState;
+    _cachedFilteredCompanies = _companyService.filterCompanies(
       categories: _selectedCategories,
       startDate: _startDate,
       minRevenue: _minRevenue,
@@ -81,6 +136,8 @@ class _HomePageState extends State<HomePage> {
       techStacks: _selectedTechStacks,
       businessModels: _selectedBusinessModels,
     );
+
+    return _cachedFilteredCompanies!;
   }
 
   void _clearFilters() {
@@ -93,6 +150,27 @@ class _HomePageState extends State<HomePage> {
       _maxTeamSize = null;
       _selectedTechStacks = [];
       _selectedBusinessModels = [];
+      // Clear caches
+      _cachedFilteredCompanies = null;
+      _lastFilterState = null;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCompanies();
+  }
+
+  void _loadCompanies() {
+    setState(() {
+      _error = null;
+      // Clear caches when reloading
+      _cachedCategories = null;
+      _cachedTechStacks = null;
+      _cachedBusinessModels = null;
+      _cachedFilteredCompanies = null;
+      _lastFilterState = null;
     });
   }
 
@@ -212,9 +290,5 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
     );
-  }
-
-  void _loadCompanies() {
-    // Implementation of _loadCompanies method
   }
 }
