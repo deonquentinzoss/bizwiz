@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'services/company_service.dart';
+import 'services/search_service.dart';
 import 'widgets/company_grid.dart';
 import 'widgets/company_details_dialog.dart';
 import 'widgets/filter_bar.dart';
 import 'widgets/sort_bar.dart';
+import 'widgets/search_bar.dart';
 import 'models/company.dart';
 
 void main() {
@@ -46,6 +48,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _companyService = CompanyService();
+  final _searchService = SearchService(CompanyService());
   String? _selectedCategory;
   DateTime? _startDate;
   DateTime? _endDate;
@@ -57,6 +60,8 @@ class _HomePageState extends State<HomePage> {
   String? _selectedBusinessModel;
   SortField? _sortField;
   SortOrder _sortOrder = SortOrder.ascending;
+  String _searchQuery = '';
+  List<Company> _searchResults = [];
 
   List<String> get _categories {
     final allCategories = _companyService
@@ -70,17 +75,20 @@ class _HomePageState extends State<HomePage> {
   List<String> get _businessModels => _companyService.getAllBusinessModels();
 
   List<Company> get _filteredAndSortedCompanies {
-    var companies = _companyService.filterCompanies(
-      category: _selectedCategory,
-      startDate: _startDate,
-      endDate: _endDate,
-      minRevenue: _minRevenue,
-      maxRevenue: _maxRevenue,
-      minTeamSize: _minTeamSize,
-      maxTeamSize: _maxTeamSize,
-      techStacks: _selectedTechStacks.isNotEmpty ? _selectedTechStacks : null,
-      businessModel: _selectedBusinessModel,
-    );
+    var companies = _searchQuery.isNotEmpty
+        ? _searchResults
+        : _companyService.filterCompanies(
+            category: _selectedCategory,
+            startDate: _startDate,
+            endDate: _endDate,
+            minRevenue: _minRevenue,
+            maxRevenue: _maxRevenue,
+            minTeamSize: _minTeamSize,
+            maxTeamSize: _maxTeamSize,
+            techStacks:
+                _selectedTechStacks.isNotEmpty ? _selectedTechStacks : null,
+            businessModel: _selectedBusinessModel,
+          );
 
     if (_sortField != null) {
       companies = _companyService.sortCompanies(
@@ -91,6 +99,18 @@ class _HomePageState extends State<HomePage> {
     }
 
     return companies;
+  }
+
+  void _handleSearch(String query) {
+    setState(() {
+      _searchQuery = query;
+      _searchResults = _searchService.search(
+        query,
+        category: _selectedCategory,
+        techStacks: _selectedTechStacks.isNotEmpty ? _selectedTechStacks : null,
+        businessModel: _selectedBusinessModel,
+      );
+    });
   }
 
   void _clearFilters() {
@@ -106,6 +126,8 @@ class _HomePageState extends State<HomePage> {
       _selectedBusinessModel = null;
       _sortField = null;
       _sortOrder = SortOrder.ascending;
+      _searchQuery = '';
+      _searchResults = [];
     });
   }
 
@@ -118,6 +140,15 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Column(
         children: [
+          CustomSearchBar(
+            onSearch: _handleSearch,
+            searchHistory: _searchService.getSearchHistory(),
+            onClearHistory: () {
+              setState(() {
+                _searchService.clearSearchHistory();
+              });
+            },
+          ),
           FilterBar(
             categories: _categories,
             techStacks: _techStacks,
