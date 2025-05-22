@@ -109,6 +109,9 @@ class FilterBar extends StatelessWidget {
                   label: const Text('Clear All'),
                 ),
               ),
+              const SizedBox(height: 8),
+              // Mobile: Selected filters
+              _buildSelectedFilters(context),
             ] else ...[
               // Desktop: All filters in a single row
               Row(
@@ -140,6 +143,9 @@ class FilterBar extends StatelessWidget {
                   ),
                 ],
               ),
+              const SizedBox(height: 8),
+              // Desktop: Selected filters
+              _buildSelectedFilters(context),
             ],
           ],
         ),
@@ -406,6 +412,80 @@ class FilterBar extends StatelessWidget {
             },
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildSelectedFilters(BuildContext context) {
+    final theme = Theme.of(context);
+    final hasSelectedFilters = selectedCategories.isNotEmpty ||
+        selectedTechStacks.isNotEmpty ||
+        selectedBusinessModels.isNotEmpty ||
+        startDate != null ||
+        minRevenue != null ||
+        maxRevenue != null ||
+        minTeamSize != null ||
+        maxTeamSize != null;
+
+    if (!hasSelectedFilters) return const SizedBox.shrink();
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        ...selectedCategories.map((category) => Chip(
+              label: Text(category),
+              onDeleted: () {
+                final newSelection = List<String>.from(selectedCategories)
+                  ..remove(category);
+                onCategoriesChanged(newSelection);
+              },
+            )),
+        ...selectedTechStacks.map((tech) => Chip(
+              label: Text(tech),
+              onDeleted: () {
+                final newSelection = List<String>.from(selectedTechStacks)
+                  ..remove(tech);
+                onTechStacksChanged(newSelection);
+              },
+            )),
+        ...selectedBusinessModels.map((model) => Chip(
+              label: Text(model),
+              onDeleted: () {
+                final newSelection = List<String>.from(selectedBusinessModels)
+                  ..remove(model);
+                onBusinessModelsChanged(newSelection);
+              },
+            )),
+        if (startDate != null)
+          Chip(
+            label: Text('Founded after ${DateFormat.y().format(startDate!)}'),
+            onDeleted: () => onStartDateChanged(null),
+          ),
+        if (minRevenue != null || maxRevenue != null)
+          Chip(
+            label: Text(
+              'Revenue: ${minRevenue != null ? '>\$${NumberFormat.compact().format(minRevenue)}' : ''}'
+              '${minRevenue != null && maxRevenue != null ? ' - ' : ''}'
+              '${maxRevenue != null ? '<\$${NumberFormat.compact().format(maxRevenue)}' : ''}',
+            ),
+            onDeleted: () {
+              onMinRevenueChanged(null);
+              onMaxRevenueChanged(null);
+            },
+          ),
+        if (minTeamSize != null || maxTeamSize != null)
+          Chip(
+            label: Text(
+              'Team Size: ${minTeamSize != null ? '>$minTeamSize' : ''}'
+              '${minTeamSize != null && maxTeamSize != null ? ' - ' : ''}'
+              '${maxTeamSize != null ? '<$maxTeamSize' : ''}',
+            ),
+            onDeleted: () {
+              onMinTeamSizeChanged(null);
+              onMaxTeamSizeChanged(null);
+            },
+          ),
       ],
     );
   }

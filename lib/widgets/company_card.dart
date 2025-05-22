@@ -3,17 +3,20 @@ import '../models/company.dart';
 import 'package:intl/intl.dart';
 import '../utils/animations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'favorite_button.dart';
 
 class CompanyCard extends StatelessWidget {
   final Company company;
   final VoidCallback onTap;
-  final bool isLoading;
+  final bool isFavorite;
+  final VoidCallback onFavoriteToggle;
 
   const CompanyCard({
     super.key,
     required this.company,
     required this.onTap,
-    this.isLoading = false,
+    required this.isFavorite,
+    required this.onFavoriteToggle,
   });
 
   @override
@@ -25,7 +28,7 @@ class CompanyCard extends StatelessWidget {
       child: Card(
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: isLoading ? null : onTap,
+          onTap: onTap,
           child: Stack(
             children: [
               Column(
@@ -117,18 +120,18 @@ class CompanyCard extends StatelessWidget {
                           children: [
                             _buildMetric(
                               context,
-                              'MRR',
-                              currencyFormat.format(company.revenue.mrr),
+                              'Revenue',
+                              currencyFormat.format(company.revenue.arr),
                             ),
                             _buildMetric(
                               context,
                               'Team',
-                              '${company.teamSize}',
+                              '${company.teamSize}+',
                             ),
                             _buildMetric(
                               context,
                               'Founded',
-                              DateFormat.yMMM().format(company.startDate),
+                              DateFormat.y().format(company.startDate),
                             ),
                           ],
                         ),
@@ -137,13 +140,15 @@ class CompanyCard extends StatelessWidget {
                   ),
                 ],
               ),
-              if (isLoading)
-                Container(
-                  color: Colors.black.withOpacity(0.3),
-                  child: const Center(
-                    child: CircularProgressIndicator(),
-                  ),
+              // Favorite Button
+              Positioned(
+                top: 8,
+                right: 8,
+                child: FavoriteButton(
+                  isFavorite: isFavorite,
+                  onToggle: onFavoriteToggle,
                 ),
+              ),
             ],
           ),
         ),

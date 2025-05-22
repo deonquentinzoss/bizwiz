@@ -4,12 +4,8 @@ import '../widgets/sort_bar.dart';
 import 'dart:math';
 
 class CompanyService {
-  List<Company> _companies = [];
+  final List<Company> _companies = mockCompanies;
   final Map<String, dynamic> _filterState = {};
-
-  CompanyService() {
-    _companies = List.from(mockCompanies);
-  }
 
   List<Company> getAllCompanies() {
     return _companies;
@@ -122,16 +118,19 @@ class CompanyService {
     return 1.0 - (difference / maxRevenue);
   }
 
+  List<String> getAllCategories() {
+    return _companies.expand((company) => company.category).toSet().toList()
+      ..sort();
+  }
+
   List<String> getAllTechStacks() {
-    final allTechStacks =
-        _companies.expand((company) => company.techStack).toSet();
-    return allTechStacks.toList()..sort();
+    return _companies.expand((company) => company.techStack).toSet().toList()
+      ..sort();
   }
 
   List<String> getAllBusinessModels() {
-    final allBusinessModels =
-        _companies.map((company) => company.businessModel).toSet();
-    return allBusinessModels.toList()..sort();
+    return _companies.map((company) => company.businessModel).toSet().toList()
+      ..sort();
   }
 
   void saveFilterState(Map<String, dynamic> state) {
@@ -143,59 +142,62 @@ class CompanyService {
     return Map.from(_filterState);
   }
 
-  List<Company> filterCompanies({
+  List<Company> filterCompanies(
+    List<Company> companies, {
     List<String>? categories,
+    List<String>? techStacks,
+    List<String>? businessModels,
     DateTime? startDate,
     double? minRevenue,
     double? maxRevenue,
     int? minTeamSize,
     int? maxTeamSize,
-    List<String>? techStacks,
-    List<String>? businessModels,
   }) {
-    // Create sets for faster lookups
-    final categorySet = categories?.toSet();
-    final techStackSet = techStacks?.toSet();
-    final businessModelSet = businessModels?.toSet();
-
-    return _companies.where((company) {
-      // Basic filters
-      if (categorySet != null && categorySet.isNotEmpty) {
-        if (!company.category
-            .any((category) => categorySet.contains(category))) {
+    return companies.where((company) {
+      if (categories != null && categories.isNotEmpty) {
+        if (!company.category.any((cat) => categories.contains(cat))) {
           return false;
         }
       }
 
-      if (startDate != null && company.startDate.isBefore(startDate)) {
-        return false;
-      }
-
-      if (minRevenue != null && company.revenue.mrr < minRevenue) {
-        return false;
-      }
-
-      if (maxRevenue != null && company.revenue.mrr > maxRevenue) {
-        return false;
-      }
-
-      if (minTeamSize != null && company.teamSize < minTeamSize) {
-        return false;
-      }
-
-      if (maxTeamSize != null && company.teamSize > maxTeamSize) {
-        return false;
-      }
-
-      // Advanced filters
-      if (techStackSet != null && techStackSet.isNotEmpty) {
-        if (!techStackSet.every((tech) => company.techStack.contains(tech))) {
+      if (techStacks != null && techStacks.isNotEmpty) {
+        if (!company.techStack.any((tech) => techStacks.contains(tech))) {
           return false;
         }
       }
 
-      if (businessModelSet != null && businessModelSet.isNotEmpty) {
-        if (!businessModelSet.contains(company.businessModel)) {
+      if (businessModels != null && businessModels.isNotEmpty) {
+        if (!businessModels.contains(company.businessModel)) {
+          return false;
+        }
+      }
+
+      if (startDate != null) {
+        if (company.startDate.isBefore(startDate)) {
+          return false;
+        }
+      }
+
+      if (minRevenue != null) {
+        if (company.revenue.arr < minRevenue) {
+          return false;
+        }
+      }
+
+      if (maxRevenue != null) {
+        if (company.revenue.arr > maxRevenue) {
+          return false;
+        }
+      }
+
+      if (minTeamSize != null) {
+        if (company.teamSize < minTeamSize) {
+          return false;
+        }
+      }
+
+      if (maxTeamSize != null) {
+        if (company.teamSize > maxTeamSize) {
           return false;
         }
       }
@@ -206,26 +208,25 @@ class CompanyService {
 
   List<Company> sortCompanies(
     List<Company> companies, {
-    required SortField field,
-    required SortOrder order,
+    required SortField sortField,
+    required SortOrder sortOrder,
   }) {
-    final sorted = List<Company>.from(companies);
-    sorted.sort((a, b) {
+    companies.sort((a, b) {
       int comparison;
-      switch (field) {
+      switch (sortField) {
         case SortField.date:
           comparison = a.startDate.compareTo(b.startDate);
           break;
         case SortField.revenue:
-          comparison = a.revenue.mrr.compareTo(b.revenue.mrr);
+          comparison = a.revenue.arr.compareTo(b.revenue.arr);
           break;
         case SortField.teamSize:
           comparison = a.teamSize.compareTo(b.teamSize);
           break;
       }
-      return order == SortOrder.ascending ? comparison : -comparison;
+      return sortOrder == SortOrder.ascending ? comparison : -comparison;
     });
-    return sorted;
+    return companies;
   }
 }
 

@@ -5,11 +5,15 @@ import 'company_card.dart';
 class CompanyGrid extends StatelessWidget {
   final List<Company> companies;
   final Function(Company) onCompanyTap;
+  final bool Function(Company) isFavorite;
+  final Function(String) onFavoriteToggle;
 
   const CompanyGrid({
     super.key,
     required this.companies,
     required this.onCompanyTap,
+    required this.isFavorite,
+    required this.onFavoriteToggle,
   });
 
   @override
@@ -45,6 +49,8 @@ class CompanyGrid extends StatelessWidget {
         return CompanyCard(
           company: company,
           onTap: () => onCompanyTap(company),
+          isFavorite: isFavorite(company),
+          onFavoriteToggle: () => onFavoriteToggle(company.id),
         );
       },
     );

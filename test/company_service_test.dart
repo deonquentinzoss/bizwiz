@@ -14,8 +14,8 @@ void main() {
       final companies = companyService.getAllCompanies();
       final sorted = companyService.sortCompanies(
         companies,
-        field: SortField.date,
-        order: SortOrder.ascending,
+        sortField: SortField.date,
+        sortOrder: SortOrder.ascending,
       );
 
       // Verify the list is sorted by date
@@ -33,8 +33,8 @@ void main() {
       final companies = companyService.getAllCompanies();
       final sorted = companyService.sortCompanies(
         companies,
-        field: SortField.date,
-        order: SortOrder.descending,
+        sortField: SortField.date,
+        sortOrder: SortOrder.descending,
       );
 
       // Verify the list is sorted by date in descending order
@@ -52,8 +52,8 @@ void main() {
       final companies = companyService.getAllCompanies();
       final sorted = companyService.sortCompanies(
         companies,
-        field: SortField.revenue,
-        order: SortOrder.ascending,
+        sortField: SortField.revenue,
+        sortOrder: SortOrder.ascending,
       );
 
       // Verify the list is sorted by revenue
@@ -70,8 +70,8 @@ void main() {
       final companies = companyService.getAllCompanies();
       final sorted = companyService.sortCompanies(
         companies,
-        field: SortField.revenue,
-        order: SortOrder.descending,
+        sortField: SortField.revenue,
+        sortOrder: SortOrder.descending,
       );
 
       // Verify the list is sorted by revenue in descending order
@@ -88,8 +88,8 @@ void main() {
       final companies = companyService.getAllCompanies();
       final sorted = companyService.sortCompanies(
         companies,
-        field: SortField.teamSize,
-        order: SortOrder.ascending,
+        sortField: SortField.teamSize,
+        sortOrder: SortOrder.ascending,
       );
 
       // Verify the list is sorted by team size
@@ -106,8 +106,8 @@ void main() {
       final companies = companyService.getAllCompanies();
       final sorted = companyService.sortCompanies(
         companies,
-        field: SortField.teamSize,
-        order: SortOrder.descending,
+        sortField: SortField.teamSize,
+        sortOrder: SortOrder.descending,
       );
 
       // Verify the list is sorted by team size in descending order

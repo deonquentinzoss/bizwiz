@@ -12,94 +12,58 @@ class SearchService {
 
   SearchService(this._companyService);
 
-  List<Company> search(
-    String query, {
-    String? category,
-    List<String>? techStacks,
-    String? businessModel,
-  }) {
-    if (query.isEmpty) return [];
+  List<String> get searchHistory => _searchHistory;
 
-    // Add to search history
-    _addToHistory(query);
-
-    // Create search parameters map
-    final searchParams = {
-      'query': query,
-      'category': category,
-      'techStacks': techStacks,
-      'businessModel': businessModel,
-    };
-
-    // Check cache
-    final cacheKey = query.toLowerCase();
-    if (_searchCache.containsKey(cacheKey) &&
-        _mapEquals(_lastSearchParams[cacheKey], searchParams)) {
-      return _searchCache[cacheKey]!;
-    }
-
-    // Get all companies
-    var results = _companyService.getAllCompanies();
-
-    // Apply search query
-    final lowercaseQuery = query.toLowerCase();
-    results = results.where((company) {
-      // Check name first (most common search)
-      if (company.name.toLowerCase().contains(lowercaseQuery)) {
-        return true;
-      }
-
-      // Check other fields only if name doesn't match
-      return company.elevatorPitch.toLowerCase().contains(lowercaseQuery) ||
-          company.category
-              .any((cat) => cat.toLowerCase().contains(lowercaseQuery)) ||
-          company.techStack
-              .any((tech) => tech.toLowerCase().contains(lowercaseQuery)) ||
-          company.businessModel.toLowerCase().contains(lowercaseQuery) ||
-          company.founder.name.toLowerCase().contains(lowercaseQuery);
-    }).toList();
-
-    // Apply filters if provided
-    if (category != null) {
-      results = results
-          .where((company) => company.category.contains(category))
-          .toList();
-    }
-    if (techStacks != null && techStacks.isNotEmpty) {
-      final techStackSet = techStacks.toSet();
-      results = results
-          .where((company) =>
-              techStackSet.every((tech) => company.techStack.contains(tech)))
-          .toList();
-    }
-    if (businessModel != null) {
-      results = results
-          .where((company) => company.businessModel == businessModel)
-          .toList();
-    }
-
-    // Update cache
-    _searchCache[cacheKey] = results;
-    _lastSearchParams[cacheKey] = searchParams;
-
-    return results;
+  void clearHistory() {
+    _searchHistory.clear();
   }
 
-  void _addToHistory(String query) {
-    if (query.isNotEmpty && !_searchHistory.contains(query)) {
+  List<Company> search(
+    String query, {
+    List<String>? categories,
+    List<String>? techStacks,
+    List<String>? businessModels,
+  }) {
+    if (query.isEmpty) {
+      return _companyService.getAllCompanies();
+    }
+
+    // Add to search history
+    if (!_searchHistory.contains(query)) {
       _searchHistory.insert(0, query);
       if (_searchHistory.length > _maxHistoryItems) {
         _searchHistory.removeLast();
       }
     }
-  }
 
-  List<String> getSearchHistory() {
-    return List.from(_searchHistory);
-  }
+    final lowercaseQuery = query.toLowerCase();
+    return _companyService.getAllCompanies().where((company) {
+      // Basic search
+      if (company.name.toLowerCase().contains(lowercaseQuery) ||
+          company.elevatorPitch.toLowerCase().contains(lowercaseQuery) ||
+          company.founder.name.toLowerCase().contains(lowercaseQuery)) {
+        return true;
+      }
 
-  void clearSearchHistory() {
-    _searchHistory.clear();
+      // Category search
+      if (company.category
+          .any((cat) => cat.toLowerCase().contains(lowercaseQuery))) {
+        return true;
+      }
+
+      // Tech stack search
+      if (company.techStack
+          .any((tech) => tech.toLowerCase().contains(lowercaseQuery))) {
+        return true;
+      }
+
+      // Business model search
+      if (company.businessModel.toLowerCase().contains(lowercaseQuery)) {
+        return true;
+      }
+
+      return false;
+    }).toList();
   }
 
   bool _mapEquals(Map<String, dynamic>? map1, Map<String, dynamic>? map2) {

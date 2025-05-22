@@ -1,5 +1,5 @@
 name: bizwiz
-description: "A new Flutter project."
+description: A web application that provides insights into successful SaaS and tech companies.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -32,7 +32,8 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.2
   intl: ^0.18.0
-  cached_network_image: ^3.3.1
+  cached_network_image: ^3.2.0
+  shared_preferences: ^2.2.2
 
 
   # The following adds the Cupertino Icons font to your application.
