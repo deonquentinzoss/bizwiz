@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bizwiz/services/company_service.dart';
 import 'package:bizwiz/widgets/sort_bar.dart';
-import 'package:bizwiz/models/company.dart';
 
 void main() {
   late CompanyService companyService;

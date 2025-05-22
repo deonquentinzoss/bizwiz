@@ -64,7 +64,7 @@ class CompanyDetailsDialog extends StatelessWidget {
                           if (loadingProgress == null) return child;
                           return Container(
                             height: 200,
-                            color: theme.colorScheme.surfaceVariant,
+                            color: theme.colorScheme.surfaceContainerHighest,
                             child: const Center(
                               child: CircularProgressIndicator(),
                             ),
@@ -73,7 +73,7 @@ class CompanyDetailsDialog extends StatelessWidget {
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             height: 200,
-                            color: theme.colorScheme.surfaceVariant,
+                            color: theme.colorScheme.surfaceContainerHighest,
                             child: Center(
                               child: Icon(
                                 Icons.business,
@@ -299,7 +299,7 @@ class CompanyDetailsDialog extends StatelessWidget {
               ],
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }

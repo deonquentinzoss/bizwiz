@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../models/company.dart';
-import 'company_card.dart';
 
 class RelatedCompaniesSection extends StatelessWidget {
   final List<Company> companies;
@@ -64,7 +63,7 @@ class RelatedCompaniesSection extends StatelessWidget {
                                     height: 120,
                                     color: Theme.of(context)
                                         .colorScheme
-                                        .surfaceVariant,
+                                        .surfaceContainerHighest,
                                     child: Center(
                                       child: Icon(
                                         Icons.business,

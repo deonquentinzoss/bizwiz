@@ -55,30 +55,30 @@ class FilterBar extends StatelessWidget {
   });
 
   static final List<RevenueRange> revenueRanges = [
-    RevenueRange('Any Revenue', null, null),
-    RevenueRange('<\$100K', null, 100000.0),
-    RevenueRange('>\$100K', 100000.0, null),
-    RevenueRange('>\$500K', 500000.0, null),
-    RevenueRange('>\$1M', 1000000.0, null),
-    RevenueRange('>\$5M', 5000000.0, null),
-    RevenueRange('>\$10M', 10000000.0, null),
-    RevenueRange('>\$50M', 50000000.0, null),
-    RevenueRange('>\$100M', 100000000.0, null),
+    const RevenueRange('Any Revenue', null, null),
+    const RevenueRange('<\$100K', null, 100000.0),
+    const RevenueRange('>\$100K', 100000.0, null),
+    const RevenueRange('>\$500K', 500000.0, null),
+    const RevenueRange('>\$1M', 1000000.0, null),
+    const RevenueRange('>\$5M', 5000000.0, null),
+    const RevenueRange('>\$10M', 10000000.0, null),
+    const RevenueRange('>\$50M', 50000000.0, null),
+    const RevenueRange('>\$100M', 100000000.0, null),
   ];
 
   static final List<TeamSizeRange> teamSizeRanges = [
-    TeamSizeRange('Any Size', null, null),
-    TeamSizeRange('1-10', 1, 10),
-    TeamSizeRange('11-50', 11, 50),
-    TeamSizeRange('51-200', 51, 200),
-    TeamSizeRange('201-500', 201, 500),
-    TeamSizeRange('501-1000', 501, 1000),
-    TeamSizeRange('1000+', 1001, null),
+    const TeamSizeRange('Any Size', null, null),
+    const TeamSizeRange('1-10', 1, 10),
+    const TeamSizeRange('11-50', 11, 50),
+    const TeamSizeRange('51-200', 51, 200),
+    const TeamSizeRange('201-500', 201, 500),
+    const TeamSizeRange('501-1000', 501, 1000),
+    const TeamSizeRange('1000+', 1001, null),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    Theme.of(context);
     final currencyFormat = NumberFormat.compactCurrency(symbol: '\$');
 
     return Card(

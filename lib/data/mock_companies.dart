@@ -16,7 +16,7 @@ final List<Company> mockCompanies = [
     ),
     teamSize: 200,
     category: ['Productivity', 'SaaS', 'Collaboration'],
-    founder: Founder(
+    founder: const Founder(
       name: 'Ivan Zhao',
       bio:
           'Former designer and developer who wanted to create a better way to organize information.',
@@ -63,7 +63,7 @@ final List<Company> mockCompanies = [
     ),
     teamSize: 50,
     category: ['Development', 'SaaS', 'Project Management'],
-    founder: Founder(
+    founder: const Founder(
       name: 'Karri Saarinen',
       bio:
           'Former designer at Airbnb who wanted to create a better issue tracking tool.',
@@ -106,7 +106,7 @@ final List<Company> mockCompanies = [
     ),
     teamSize: 150,
     category: ['Development', 'Cloud', 'Infrastructure'],
-    founder: Founder(
+    founder: const Founder(
       name: 'Guillermo Rauch',
       bio: 'Creator of Socket.io and former CTO of LearnBoost.',
       socialLinks: SocialLinks(

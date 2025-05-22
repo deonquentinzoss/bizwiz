@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'services/company_service.dart';
-import 'services/search_service.dart';
 import 'widgets/company_grid.dart';
 import 'widgets/company_details_dialog.dart';
 import 'widgets/filter_bar.dart';
 import 'widgets/sort_bar.dart';
-import 'widgets/search_bar.dart';
 import 'models/company.dart';
 
 void main() {
@@ -48,9 +46,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final CompanyService _companyService = CompanyService();
-  final SearchService _searchService = SearchService(CompanyService());
-  String _searchQuery = '';
-  List<String> _searchHistory = [];
+  final List<String> _searchHistory = [];
   List<String> _selectedCategories = [];
   DateTime? _startDate;
   double? _minRevenue;
@@ -61,7 +57,6 @@ class _HomePageState extends State<HomePage> {
   List<String> _selectedBusinessModels = [];
   SortField? _sortField;
   SortOrder _sortOrder = SortOrder.ascending;
-  bool _isLoading = false;
   String? _error;
 
   List<String> get _categories {
@@ -90,7 +85,6 @@ class _HomePageState extends State<HomePage> {
 
   void _clearFilters() {
     setState(() {
-      _searchQuery = '';
       _selectedCategories = [];
       _startDate = null;
       _minRevenue = null;
@@ -185,7 +179,6 @@ class _HomePageState extends State<HomePage> {
                   onClearFilters: _clearFilters,
                   onSearch: (query) {
                     setState(() {
-                      _searchQuery = query;
                       if (query.isNotEmpty && !_searchHistory.contains(query)) {
                         _searchHistory.add(query);
                       }

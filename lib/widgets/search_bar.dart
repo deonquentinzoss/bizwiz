@@ -118,7 +118,7 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
                         _onSearch(query);
                       },
                     );
-                  }).toList(),
+                  }),
                 ],
               ),
             ),

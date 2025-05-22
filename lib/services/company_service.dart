@@ -48,35 +48,35 @@ class CompanyService {
     double totalWeight = 0.0;
 
     // Category similarity (30% weight)
-    final categoryWeight = 0.3;
+    const categoryWeight = 0.3;
     final categoryScore =
         _calculateCategorySimilarity(company1.category, company2.category);
     score += categoryScore * categoryWeight;
     totalWeight += categoryWeight;
 
     // Technology stack similarity (25% weight)
-    final techWeight = 0.25;
+    const techWeight = 0.25;
     final techScore =
         _calculateTechStackSimilarity(company1.techStack, company2.techStack);
     score += techScore * techWeight;
     totalWeight += techWeight;
 
     // Business model similarity (20% weight)
-    final modelWeight = 0.2;
+    const modelWeight = 0.2;
     final modelScore =
         company1.businessModel == company2.businessModel ? 1.0 : 0.0;
     score += modelScore * modelWeight;
     totalWeight += modelWeight;
 
     // Team size similarity (15% weight)
-    final teamWeight = 0.15;
+    const teamWeight = 0.15;
     final teamScore =
         _calculateTeamSizeSimilarity(company1.teamSize, company2.teamSize);
     score += teamScore * teamWeight;
     totalWeight += teamWeight;
 
     // Revenue similarity (10% weight)
-    final revenueWeight = 0.1;
+    const revenueWeight = 0.1;
     final revenueScore =
         _calculateRevenueSimilarity(company1.revenue.mrr, company2.revenue.mrr);
     score += revenueScore * revenueWeight;

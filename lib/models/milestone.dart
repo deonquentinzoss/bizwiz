@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 enum MilestoneType { funding, product, growth, team, other }
 
 class Milestone {

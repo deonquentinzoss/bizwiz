@@ -39,7 +39,7 @@ class CompanyCard extends StatelessWidget {
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
                         return Container(
-                          color: theme.colorScheme.surfaceVariant,
+                          color: theme.colorScheme.surfaceContainerHighest,
                           child: Center(
                             child: CircularProgressIndicator(
                               value: loadingProgress.expectedTotalBytes != null
@@ -52,7 +52,7 @@ class CompanyCard extends StatelessWidget {
                       },
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
-                          color: theme.colorScheme.surfaceVariant,
+                          color: theme.colorScheme.surfaceContainerHighest,
                           child: Center(
                             child: Icon(
                               Icons.business,
