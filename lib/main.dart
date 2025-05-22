@@ -118,6 +118,8 @@ class _HomePageState extends State<HomePage> {
       'maxTeamSize': _maxTeamSize,
       'techStacks': _selectedTechStacks,
       'businessModels': _selectedBusinessModels,
+      'sortField': _sortField,
+      'sortOrder': _sortOrder,
     };
 
     // If filters haven't changed, return cached result
@@ -154,6 +156,27 @@ class _HomePageState extends State<HomePage> {
     } else if (_searchQuery != null) {
       // If search query is empty string, show all companies
       companies = _companyService.getAllCompanies();
+    }
+
+    // Apply sorting if a sort field is selected
+    if (_sortField != null) {
+      companies.sort((a, b) {
+        int comparison;
+        switch (_sortField) {
+          case SortField.date:
+            comparison = a.startDate.compareTo(b.startDate);
+            break;
+          case SortField.revenue:
+            comparison = a.revenue.arr.compareTo(b.revenue.arr);
+            break;
+          case SortField.teamSize:
+            comparison = a.teamSize.compareTo(b.teamSize);
+            break;
+          default:
+            comparison = 0;
+        }
+        return _sortOrder == SortOrder.ascending ? comparison : -comparison;
+      });
     }
 
     _cachedFilteredCompanies = companies;

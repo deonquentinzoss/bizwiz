@@ -37,19 +37,39 @@ class CompanyCard extends StatelessWidget {
                     child: CachedNetworkImage(
                       imageUrl: company.logo,
                       fit: BoxFit.cover,
+                      memCacheWidth: 400,
+                      memCacheHeight: 225,
+                      fadeInDuration: const Duration(milliseconds: 300),
                       placeholder: (context, url) => Container(
                         color: theme.colorScheme.surfaceContainerHighest,
-                        child: const Center(
-                          child: CircularProgressIndicator(),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              theme.colorScheme.primary,
+                            ),
+                          ),
                         ),
                       ),
                       errorWidget: (context, url, error) => Container(
                         color: theme.colorScheme.surfaceContainerHighest,
                         child: Center(
-                          child: Icon(
-                            Icons.business,
-                            size: 48,
-                            color: theme.colorScheme.primary,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.business,
+                                size: 32,
+                                color: theme.colorScheme.primary,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Failed to load image',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.error,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
