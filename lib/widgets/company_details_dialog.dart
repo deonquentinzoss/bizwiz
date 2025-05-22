@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import '../models/company.dart';
 import 'package:intl/intl.dart';
+import 'related_companies_section.dart';
+import '../services/company_service.dart';
 
 class CompanyDetailsDialog extends StatelessWidget {
   final Company company;
+  final CompanyService _companyService = CompanyService();
 
-  const CompanyDetailsDialog({
+  CompanyDetailsDialog({
     super.key,
     required this.company,
   });
@@ -14,15 +17,15 @@ class CompanyDetailsDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final currencyFormat = NumberFormat.compactCurrency(symbol: '\$');
+    final relatedCompanies = _companyService.getRelatedCompanies(company.id);
 
     return Dialog(
+      insetPadding: const EdgeInsets.all(16),
       child: Container(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.8,
-          maxHeight: MediaQuery.of(context).size.height * 0.8,
-        ),
+        constraints: const BoxConstraints(maxWidth: 800),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header with close button
             Padding(
@@ -45,7 +48,7 @@ class CompanyDetailsDialog extends StatelessWidget {
             // Scrollable content
             Flexible(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.all(24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -140,6 +143,18 @@ class CompanyDetailsDialog extends StatelessWidget {
                     // Milestones
                     _buildMilestonesSection(context, company),
                     const SizedBox(height: 24),
+                    RelatedCompaniesSection(
+                      companies: relatedCompanies,
+                      onCompanyTap: (relatedCompany) {
+                        Navigator.of(context).pop();
+                        showDialog(
+                          context: context,
+                          builder: (context) => CompanyDetailsDialog(
+                            company: relatedCompany,
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),
