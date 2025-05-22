@@ -10,17 +10,17 @@ void main() {
       MaterialApp(
         home: Scaffold(
           body: FilterBar(
-            categories: ['SaaS', 'Tech'],
-            techStacks: ['Flutter', 'Dart'],
-            businessModels: ['B2B', 'B2C'],
-            selectedCategories: [],
+            categories: const ['SaaS', 'Tech'],
+            techStacks: const ['Flutter', 'Dart'],
+            businessModels: const ['B2B', 'B2C'],
+            selectedCategories: const [],
             startDate: null,
             minRevenue: null,
             maxRevenue: null,
             minTeamSize: null,
             maxTeamSize: null,
-            selectedTechStacks: [],
-            selectedBusinessModels: [],
+            selectedTechStacks: const [],
+            selectedBusinessModels: const [],
             onCategoriesChanged: (_) {},
             onStartDateChanged: (_) {},
             onMinRevenueChanged: (_) {},
@@ -31,7 +31,7 @@ void main() {
             onBusinessModelsChanged: (_) {},
             onClearFilters: () {},
             onSearch: (_) {},
-            searchHistory: [],
+            searchHistory: const [],
             onClearHistory: () {},
           ),
         ),
@@ -52,17 +52,17 @@ void main() {
       MaterialApp(
         home: Scaffold(
           body: FilterBar(
-            categories: ['SaaS', 'Tech'],
-            techStacks: ['Flutter', 'Dart'],
-            businessModels: ['B2B', 'B2C'],
-            selectedCategories: ['SaaS'],
+            categories: const ['SaaS', 'Tech'],
+            techStacks: const ['Flutter', 'Dart'],
+            businessModels: const ['B2B', 'B2C'],
+            selectedCategories: const ['SaaS'],
             startDate: DateTime(2020),
             minRevenue: 1000000,
             maxRevenue: 5000000,
             minTeamSize: 10,
             maxTeamSize: 50,
-            selectedTechStacks: ['Flutter'],
-            selectedBusinessModels: ['B2B'],
+            selectedTechStacks: const ['Flutter'],
+            selectedBusinessModels: const ['B2B'],
             onCategoriesChanged: (_) {},
             onStartDateChanged: (_) {},
             onMinRevenueChanged: (_) {},
@@ -73,7 +73,7 @@ void main() {
             onBusinessModelsChanged: (_) {},
             onClearFilters: () {},
             onSearch: (_) {},
-            searchHistory: [],
+            searchHistory: const [],
             onClearHistory: () {},
           ),
         ),
@@ -92,11 +92,6 @@ void main() {
   testWidgets('FilterBar calls callbacks when filters change',
       (WidgetTester tester) async {
     String? selectedCategory;
-    DateTime? selectedDate;
-    double? minRevenue;
-    double? maxRevenue;
-    int? minTeamSize;
-    int? maxTeamSize;
     String? selectedTechStack;
     String? selectedBusinessModel;
 
@@ -104,35 +99,25 @@ void main() {
       MaterialApp(
         home: Scaffold(
           body: FilterBar(
-            categories: ['SaaS', 'Tech'],
-            techStacks: ['Flutter', 'Dart'],
-            businessModels: ['B2B', 'B2C'],
-            selectedCategories: [],
+            categories: const ['SaaS', 'Tech'],
+            techStacks: const ['Flutter', 'Dart'],
+            businessModels: const ['B2B', 'B2C'],
+            selectedCategories: const [],
             startDate: null,
             minRevenue: null,
             maxRevenue: null,
             minTeamSize: null,
             maxTeamSize: null,
-            selectedTechStacks: [],
-            selectedBusinessModels: [],
+            selectedTechStacks: const [],
+            selectedBusinessModels: const [],
             onCategoriesChanged: (categories) {
               selectedCategory = categories.first;
             },
-            onStartDateChanged: (date) {
-              selectedDate = date;
-            },
-            onMinRevenueChanged: (revenue) {
-              minRevenue = revenue;
-            },
-            onMaxRevenueChanged: (revenue) {
-              maxRevenue = revenue;
-            },
-            onMinTeamSizeChanged: (size) {
-              minTeamSize = size;
-            },
-            onMaxTeamSizeChanged: (size) {
-              maxTeamSize = size;
-            },
+            onStartDateChanged: (date) {},
+            onMinRevenueChanged: (revenue) {},
+            onMaxRevenueChanged: (revenue) {},
+            onMinTeamSizeChanged: (size) {},
+            onMaxTeamSizeChanged: (size) {},
             onTechStacksChanged: (stacks) {
               selectedTechStack = stacks.first;
             },
@@ -141,7 +126,7 @@ void main() {
             },
             onClearFilters: () {},
             onSearch: (_) {},
-            searchHistory: [],
+            searchHistory: const [],
             onClearHistory: () {},
           ),
         ),
@@ -187,17 +172,17 @@ void main() {
       MaterialApp(
         home: Scaffold(
           body: FilterBar(
-            categories: ['SaaS', 'Tech'],
-            techStacks: ['Flutter', 'Dart'],
-            businessModels: ['B2B', 'B2C'],
-            selectedCategories: ['SaaS'],
+            categories: const ['SaaS', 'Tech'],
+            techStacks: const ['Flutter', 'Dart'],
+            businessModels: const ['B2B', 'B2C'],
+            selectedCategories: const ['SaaS'],
             startDate: DateTime(2020),
             minRevenue: 1000000,
             maxRevenue: 5000000,
             minTeamSize: 10,
             maxTeamSize: 50,
-            selectedTechStacks: ['Flutter'],
-            selectedBusinessModels: ['B2B'],
+            selectedTechStacks: const ['Flutter'],
+            selectedBusinessModels: const ['B2B'],
             onCategoriesChanged: (_) {},
             onStartDateChanged: (_) {},
             onMinRevenueChanged: (_) {},
@@ -210,7 +195,7 @@ void main() {
               clearPressed = true;
             },
             onSearch: (_) {},
-            searchHistory: [],
+            searchHistory: const [],
             onClearHistory: () {},
           ),
         ),
@@ -229,17 +214,17 @@ void main() {
       MaterialApp(
         home: Scaffold(
           body: FilterBar(
-            categories: ['SaaS', 'Tech'],
-            techStacks: ['Flutter', 'Dart'],
-            businessModels: ['B2B', 'B2C'],
-            selectedCategories: [],
+            categories: const ['SaaS', 'Tech'],
+            techStacks: const ['Flutter', 'Dart'],
+            businessModels: const ['B2B', 'B2C'],
+            selectedCategories: const [],
             startDate: null,
             minRevenue: null,
             maxRevenue: null,
             minTeamSize: null,
             maxTeamSize: null,
-            selectedTechStacks: [],
-            selectedBusinessModels: [],
+            selectedTechStacks: const [],
+            selectedBusinessModels: const [],
             onCategoriesChanged: (_) {},
             onStartDateChanged: (_) {},
             onMinRevenueChanged: (_) {},
@@ -250,7 +235,7 @@ void main() {
             onBusinessModelsChanged: (_) {},
             onClearFilters: () {},
             onSearch: (_) {},
-            searchHistory: ['TechCorp', 'DataFlow'],
+            searchHistory: const ['TechCorp', 'DataFlow'],
             onClearHistory: () {},
           ),
         ),

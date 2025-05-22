@@ -1,61 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bizwiz/services/search_service.dart';
-import 'package:bizwiz/models/company.dart';
 import 'package:bizwiz/services/company_service.dart';
 
 void main() {
   late SearchService searchService;
   late CompanyService companyService;
-  late List<Company> mockCompanies;
 
   setUp(() {
     companyService = CompanyService();
     searchService = SearchService(companyService);
-    mockCompanies = [
-      Company(
-        id: '1',
-        name: 'TechCorp',
-        logo: 'logo1.png',
-        elevatorPitch: 'Leading tech company',
-        startDate: DateTime(2020),
-        revenue:
-            Revenue(mrr: 100000, arr: 1200000, lastUpdated: DateTime.now()),
-        teamSize: 50,
-        category: ['SaaS', 'Tech'],
-        founder: Founder(
-          name: 'John Doe',
-          bio: 'Tech entrepreneur',
-          socialLinks: SocialLinks(),
-        ),
-        companyHistory: 'Founded in 2020',
-        milestones: [],
-        techStack: ['Flutter', 'Dart'],
-        businessModel: 'B2B',
-        marketingStrategies: [],
-        relatedCompanies: [],
-      ),
-      Company(
-        id: '2',
-        name: 'DataFlow',
-        logo: 'logo2.png',
-        elevatorPitch: 'Data analytics platform',
-        startDate: DateTime(2021),
-        revenue: Revenue(mrr: 50000, arr: 600000, lastUpdated: DateTime.now()),
-        teamSize: 25,
-        category: ['Data', 'Analytics'],
-        founder: Founder(
-          name: 'Jane Smith',
-          bio: 'Data scientist',
-          socialLinks: SocialLinks(),
-        ),
-        companyHistory: 'Founded in 2021',
-        milestones: [],
-        techStack: ['Python', 'TensorFlow'],
-        businessModel: 'B2B',
-        marketingStrategies: [],
-        relatedCompanies: [],
-      ),
-    ];
   });
 
   group('SearchService Tests', () {

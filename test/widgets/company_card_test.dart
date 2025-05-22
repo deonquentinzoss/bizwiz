@@ -13,7 +13,7 @@ void main() {
     revenue: Revenue(mrr: 100000, arr: 1200000, lastUpdated: DateTime.now()),
     teamSize: 50,
     category: ['SaaS', 'Tech'],
-    founder: Founder(
+    founder: const Founder(
       name: 'John Doe',
       bio: 'Tech entrepreneur',
       socialLinks: SocialLinks(),
@@ -102,7 +102,7 @@ void main() {
       revenue: Revenue(mrr: 100000, arr: 1200000, lastUpdated: DateTime.now()),
       teamSize: 50,
       category: ['SaaS', 'Tech'],
-      founder: Founder(
+      founder: const Founder(
         name: 'John Doe',
         bio: 'Tech entrepreneur',
         socialLinks: SocialLinks(),
@@ -145,7 +145,7 @@ void main() {
       ),
       teamSize: 50,
       category: ['SaaS', 'Tech'],
-      founder: Founder(
+      founder: const Founder(
         name: 'John Doe',
         bio: 'Tech entrepreneur',
         socialLinks: SocialLinks(),
